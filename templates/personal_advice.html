@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2>个性化健康建议</h2>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- 健康状况概览 -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4>健康状况概览</h4>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h5>基本指标</h5>
+                        <ul class="list-unstyled">
+                            <li>血压：120/80 mmHg</li>
+                            <li>血糖：5.6 mmol/L</li>
+                            <li>体重：65 kg</li>
+                            <li>BMI：22.5</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>生活习惯评估</h5>
+                        <div class="progress mb-2">
+                            <div class="progress-bar" role="progressbar" style="width: 75%">运动情况</div>
+                        </div>
+                        <div class="progress mb-2">
+                            <div class="progress-bar" role="progressbar" style="width: 85%">饮食习惯</div>
+                        </div>
+                        <div class="progress mb-2">
+                            <div class="progress-bar" role="progressbar" style="width: 90%">睡眠质量</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 个性化建议 -->
+        <div class="card">
+            <div class="card-body">
+                <h4>个性化建议</h4>
+                <div class="advice-list mt-3">
+                    <div class="advice-item mb-4">
+                        <h5>饮食建议</h5>
+                        <p>根据您的身体状况，建议：</p>
+                        <ul>
+                            <li>增加蔬菜水果的摄入</li>
+                            <li>控制盐分摄入，每日不超过6g</li>
+                            <li>适量补充优质蛋白</li>
+                        </ul>
+                    </div>
+
+                    <div class="advice-item mb-4">
+                        <h5>运动建议</h5>
+                        <p>建议您：</p>
+                        <ul>
+                            <li>每天进行30分钟中等强度运动</li>
+                            <li>建议选择散步、太极拳等低强度运动</li>
+                            <li>运动时注意循序渐进</li>
+                        </ul>
+                    </div>
+
+                    <div class="advice-item">
+                        <h5>生活方式建议</h5>
+                        <p>为了保持健康，建议您：</p>
+                        <ul>
+                            <li>保持规律作息，按时作息</li>
+                            <li>保持心情愉悦，适当社交</li>
+                            <li>定期进行健康检查</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- 健康目标 -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4>健康目标</h4>
+                <div class="list-group">
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>每日步数</span>
+                            <span class="badge bg-primary">6000步</span>
+                        </div>
+                        <div class="progress mt-2" style="height: 5px;">
+                            <div class="progress-bar" role="progressbar" style="width: 80%"></div>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>饮水量</span>
+                            <span class="badge bg-primary">1500ml</span>
+                        </div>
+                        <div class="progress mt-2" style="height: 5px;">
+                            <div class="progress-bar" role="progressbar" style="width: 60%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 注意事项 -->
+        <div class="card">
+            <div class="card-body">
+                <h4>注意事项</h4>
+                <div class="alert alert-warning">
+                    <p class="mb-0">如果出现不适症状，请及时就医。运动时注意适度，不要过度劳累。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

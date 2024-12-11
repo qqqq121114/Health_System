@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2>健康教育资源</h2>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- 文章列表 -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3>最新健康知识</h3>
+                
+                <div class="article-list">
+                    <div class="article-item border-bottom py-3">
+                        <h4>合理饮食的重要性</h4>
+                        <p class="text-muted">了解如何通过均衡饮食来维护身体健康，预防疾病的发生。</p>
+                        <a href="#" class="btn btn-sm btn-outline-primary">阅读更多</a>
+                    </div>
+
+                    <div class="article-item border-bottom py-3">
+                        <h4>老年人运动指南</h4>
+                        <p class="text-muted">针对老年人的特点，介绍适合的运动方式和注意事项。</p>
+                        <a href="#" class="btn btn-sm btn-outline-primary">阅读更多</a>
+                    </div>
+
+                    <div class="article-item border-bottom py-3">
+                        <h4>常见慢性病预防</h4>
+                        <p class="text-muted">高血压、糖尿病等常见慢性病的预防知识和生活建议。</p>
+                        <a href="#" class="btn btn-sm btn-outline-primary">阅读更多</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- 知识分类 -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4>知识分类</h4>
+                <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action">饮食营养</a>
+                    <a href="#" class="list-group-item list-group-item-action">运动健康</a>
+                    <a href="#" class="list-group-item list-group-item-action">疾病预防</a>
+                    <a href="#" class="list-group-item list-group-item-action">心理健康</a>
+                    <a href="#" class="list-group-item list-group-item-action">生活方式</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 健康小贴士 -->
+        <div class="card">
+            <div class="card-body">
+                <h4>每日健康小贴士</h4>
+                <div class="alert alert-info">
+                    <p class="mb-0">保持良好的作息时间，每天保证7-8小时的睡眠时间。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
