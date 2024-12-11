@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
@@ -25,7 +25,6 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    health_records = db.relationship('HealthRecord', backref='user', lazy=True)
 
 class HealthRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -34,15 +33,6 @@ class HealthRecord(db.Model):
     record_date = db.Column(db.DateTime, nullable=False)
     description = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'record_type': self.record_type,
-            'record_date': self.record_date.strftime('%Y-%m-%d'),
-            'description': self.description,
-            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M')
-        }
 
 # 创建所有数据表
 with app.app_context():
@@ -99,24 +89,6 @@ def add_health_record():
             print(f"Error: {str(e)}")
             
         return redirect(url_for('health_records'))
-
-@app.route('/get_record/<int:record_id>')
-def get_record(record_id):
-    record = HealthRecord.query.get_or_404(record_id)
-    return jsonify(record.to_dict())
-
-@app.route('/delete_record/<int:record_id>', methods=['POST'])
-def delete_record(record_id):
-    try:
-        record = HealthRecord.query.get_or_404(record_id)
-        db.session.delete(record)
-        db.session.commit()
-        flash('记录已成功删除！', 'success')
-        return jsonify({'success': True})
-    except Exception as e:
-        db.session.rollback()
-        flash('删除记录失败，请重试。', 'danger')
-        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/health_education')
 def health_education():

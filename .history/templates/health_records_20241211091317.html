@@ -8,6 +8,14 @@
     </div>
 </div>
 
+<div class="row mb-4">
+    <div class="col-md-12">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRecordModal">
+            添加健康记录
+        </button>
+    </div>
+</div>
+
 <!-- 显示提示消息 -->
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -19,14 +27,6 @@
         {% endfor %}
     {% endif %}
 {% endwith %}
-
-<div class="row mb-4">
-    <div class="col-md-12">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRecordModal">
-            添加健康记录
-        </button>
-    </div>
-</div>
 
 <div class="row">
     <div class="col-md-12">
@@ -53,8 +53,8 @@
                                 <td>{{ record.description }}</td>
                                 <td>{{ record.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-sm btn-info view-record" data-record-id="{{ record.id }}">查看</button>
-                                    <button type="button" class="btn btn-sm btn-danger delete-record" data-record-id="{{ record.id }}">删除</button>
+                                    <button class="btn btn-sm btn-info" onclick="viewRecord({{ record.id }})">查看</button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteRecord({{ record.id }})">删除</button>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -116,22 +116,7 @@
             </div>
             <div class="modal-body">
                 <div id="recordDetails">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">记录类型</label>
-                        <p id="viewRecordType"></p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">记录日期</label>
-                        <p id="viewRecordDate"></p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">描述</label>
-                        <p id="viewRecordDescription"></p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">创建时间</label>
-                        <p id="viewRecordCreatedAt"></p>
-                    </div>
+                    <!-- 记录详情将通过JavaScript动态填充 -->
                 </div>
             </div>
             <div class="modal-footer">
@@ -142,79 +127,18 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // 初始化日期选择器为当前日期
-    document.querySelector('input[type="date"]').valueAsDate = new Date();
+// 查看记录详情
+function viewRecord(recordId) {
+    // TODO: 实现查看记录详情的功能
+    console.log('查看记录:', recordId);
+}
 
-    // 初始化所有模态框
-    const addModal = new bootstrap.Modal(document.getElementById('addRecordModal'));
-    const viewModal = new bootstrap.Modal(document.getElementById('viewRecordModal'));
-
-    // 监听表单提交
-    const form = document.getElementById('addRecordForm');
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // 提交表单
-        fetch(form.action, {
-            method: 'POST',
-            body: new FormData(form)
-        })
-        .then(response => response.text())
-        .then(() => {
-            // 关闭模态框并刷新页面
-            addModal.hide();
-            window.location.reload();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('添加记录失败，请重试');
-        });
-    });
-
-    // 查看记录
-    document.querySelectorAll('.view-record').forEach(button => {
-        button.addEventListener('click', function() {
-            const recordId = this.dataset.recordId;
-            fetch(`/get_record/${recordId}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('viewRecordType').textContent = data.record_type;
-                    document.getElementById('viewRecordDate').textContent = data.record_date;
-                    document.getElementById('viewRecordDescription').textContent = data.description;
-                    document.getElementById('viewRecordCreatedAt').textContent = data.created_at;
-                    viewModal.show();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('获取记录详情失败，请重试');
-                });
-        });
-    });
-
-    // 删除记录
-    document.querySelectorAll('.delete-record').forEach(button => {
-        button.addEventListener('click', function() {
-            if (confirm('确定要删除这条记录吗？')) {
-                const recordId = this.dataset.recordId;
-                fetch(`/delete_record/${recordId}`, {
-                    method: 'POST'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.reload();
-                    } else {
-                        alert('删除失败，请重试');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('删除记录失败，请重试');
-                });
-            }
-        });
-    });
-});
+// 删除记录
+function deleteRecord(recordId) {
+    if (confirm('确定要删除这条记录吗？')) {
+        // TODO: 实现删除记录的功能
+        console.log('删除记录:', recordId);
+    }
+}
 </script>
 {% endblock %} 
