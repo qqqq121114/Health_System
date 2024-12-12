@@ -30,7 +30,7 @@ migrate = Migrate(app, db)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-login_manager.login_message = '请先登录后再���问此页面'
+login_manager.login_message = '请先登录后再访问此页面'
 login_manager.login_message_category = 'info'
 
 @login_manager.user_loader
@@ -57,8 +57,6 @@ def index():
     if current_user.is_authenticated:
         if current_user.role == 'DOCTOR':
             return redirect(url_for('doctor_home'))
-        else:
-            return redirect(url_for('health_records'))
     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -131,7 +129,7 @@ def register():
             )
             user.set_password(password)
             
-            # 保存到��据库
+            # 保存到数据库
             db.session.add(user)
             db.session.commit()
             
@@ -193,7 +191,7 @@ def doctor_home():
         func.date(HealthRecord.record_date) == today_date
     ).count()
     
-    # 获取待复数量
+    # 获取待复���数量
     follow_up_count = FollowUp.query.filter_by(
         doctor_id=current_user.id,
         status='pending'
