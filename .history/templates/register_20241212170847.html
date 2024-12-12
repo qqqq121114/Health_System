@@ -140,23 +140,10 @@ document.addEventListener('DOMContentLoaded', function() {
     idNumber.addEventListener('input', function() {
         if (this.value.length === 18) {
             const genderNum = this.value.charAt(16);
-            const autoGender = parseInt(genderNum) % 2 === 0 ? '女' : '男';
-            gender.value = autoGender;
-            
-            // 更新选择框样式，但保持可见
-            gender.style.backgroundColor = '#f8f9fa';
-            gender.style.cursor = 'not-allowed';
-            
-            // 禁用选项而不是整个选择框
-            Array.from(gender.options).forEach(option => {
-                option.disabled = option.value !== autoGender;
-            });
+            gender.value = parseInt(genderNum) % 2 === 0 ? '女' : '男';
+            gender.disabled = true;  // 锁定性别选择
         } else {
-            gender.style.backgroundColor = '';
-            gender.style.cursor = '';
-            Array.from(gender.options).forEach(option => {
-                option.disabled = false;
-            });
+            gender.disabled = false;  // 解锁性别选择
         }
     });
 });
