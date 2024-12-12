@@ -73,7 +73,7 @@ class HealthRecord(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    doctor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # 允许为空，表示待审核
+    doctor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     record_type = db.Column(db.String(50), nullable=False)  # 记录类型（病史记录/体检报告/日常监测）
     record_date = db.Column(db.DateTime, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -94,8 +94,6 @@ class HealthRecord(db.Model):
     heart_rate = db.Column(db.Integer)  # 心率
     blood_sugar = db.Column(db.Float)  # 血糖
     blood_fat = db.Column(db.Text)  # 血脂
-    blood_routine = db.Column(db.Text)  # 血常规
-    urine_routine = db.Column(db.Text)  # 尿常规
     liver_function = db.Column(db.Text)  # 肝功能
     kidney_function = db.Column(db.Text)  # 肾功能
     

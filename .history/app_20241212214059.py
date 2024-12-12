@@ -6,27 +6,15 @@ from datetime import datetime
 from flask_migrate import Migrate
 import sqlite3
 import os
-import logging
 from sqlalchemy import func
 from models import db, User, HealthRecord, FollowUp
-
-# 设置日志记录
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-
-# 定义记录类型映射
-RECORD_TYPES = {
-    'MEDICAL_HISTORY': '病史记录',
-    'PHYSICAL_EXAM': '体检报告',
-    'DAILY_MONITOR': '日常监测'
-}
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key'
 
 # 确保数据库目录存在
 basedir = os.path.abspath(os.path.dirname(__file__))
-database_dir = os.path.join(basedir, 'instance')
+database_dir = os.path.join(basedir, 'database')
 if not os.path.exists(database_dir):
     os.makedirs(database_dir)
 
@@ -50,6 +38,12 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # 定义常量
+RECORD_TYPES = {
+    'PHYSICAL_EXAM': '体检报告',
+    'MEDICAL_HISTORY': '病史记录',
+    'DAILY_MONITOR': '日常监测'
+}
+
 PATIENT_STATUS = {
     'NEW': 'new',           # 新患者
     'ACTIVE': 'active',     # 正常就诊
@@ -414,7 +408,7 @@ def doctor_patient_list():
 @app.route('/doctor/view_patient/<int:patient_id>')
 @login_required
 def doctor_view_patient(patient_id):
-    """查看患者详情页面"""
+    """查看��者详情页面"""
     if current_user.role != 'DOCTOR':
         flash('无权访问此页面', 'danger')
         return redirect(url_for('index'))
@@ -501,7 +495,7 @@ def doctor_view_patient(patient_id):
 @app.route('/api/check_patient/<username>')
 @login_required
 def check_patient(username):
-    """检查患者信息 API"""
+    """检查患者信息的 API"""
     if current_user.role != 'DOCTOR':
         return jsonify({
             'success': False,
@@ -594,7 +588,7 @@ def update_follow_up(follow_up_id):
         
         follow_up = FollowUp.query.get_or_404(follow_up_id)
         
-        # 检查是否是医生的复诊记录
+        # 检查是否是该医生的复诊记录
         if follow_up.doctor_id != current_user.id:
             return jsonify({
                 'success': False,
@@ -809,39 +803,22 @@ def edit_health_record(record_id):
 @login_required
 def add_health_record():
     """用户添加健康记录"""
-    logger.info("开始处理添加健康记录请求")
-    logger.info(f"当前用户ID: {current_user.id}")
-    logger.info(f"当前用户角色: {current_user.role}")
-    logger.info(f"请求方法: {request.method}")
-    logger.info(f"Content-Type: {request.headers.get('Content-Type')}")
-    logger.info(f"表单数据: {request.form}")
-    
     if current_user.role != 'PATIENT':
-        error_msg = '无权进行此操作'
-        logger.error(error_msg)
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'success': False, 'message': error_msg}), 403
-        flash(error_msg, 'danger')
+        flash('无权进行此操作', 'danger')
         return redirect(url_for('index'))
     
     try:
         # 获取表单数据
         record_type = request.form.get('record_type')
-        if not record_type:
-            raise ValueError('记录类型不能为空')
-        logger.info(f"记录类型: {record_type}")
-        
-        record_date_str = request.form.get('record_date')
-        if not record_date_str:
-            raise ValueError('记录日期不能为空')
-        record_date = datetime.strptime(record_date_str, '%Y-%m-%d')
-        logger.info(f"记录日���: {record_date}")
+        # 将中文类型转换为英文存储
+        record_type_en = {v: k for k, v in RECORD_TYPES.items()}.get(record_type, record_type)
+        record_date = datetime.strptime(request.form.get('record_date'), '%Y-%m-%d')
         
         # 创建新记录
         new_record = HealthRecord(
             patient_id=current_user.id,
             doctor_id=None,  # 初始设置为None，等待医生审核
-            record_type=record_type,
+            record_type=record_type_en,
             record_date=record_date,
             description=request.form.get('description'),
             symptoms=request.form.get('symptoms'),
@@ -850,39 +827,23 @@ def add_health_record():
             blood_pressure=f"{request.form.get('blood_pressure_sys', '')}/{request.form.get('blood_pressure_dia', '')}",
             heart_rate=request.form.get('heart_rate', type=int),
             blood_sugar=request.form.get('blood_sugar', type=float),
+            blood_routine=request.form.get('blood_routine'),
+            urine_routine=request.form.get('urine_routine'),
             liver_function=request.form.get('liver_function'),
             kidney_function=request.form.get('kidney_function'),
             temperature=request.form.get('body_temperature', type=float)
         )
         
-        logger.info("准备添加记录到数据库")
         db.session.add(new_record)
         db.session.commit()
-        logger.info("记录添加成功")
-        
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'success': True, 'message': '健康记录添加成功！'})
         
         flash('健康记录添加成功！', 'success')
         return redirect(url_for('health_records'))
         
-    except ValueError as e:
-        db.session.rollback()
-        error_msg = str(e)
-        logger.error(f"数据验证错误: {error_msg}")
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'success': False, 'message': error_msg}), 400
-        flash(error_msg, 'danger')
-        return redirect(url_for('health_records'))
-        
     except Exception as e:
         db.session.rollback()
-        error_msg = '添加记录失败，请重试'
-        logger.error(f"添加记录失败: {str(e)}")
-        logger.exception("详细错误信息")
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'success': False, 'message': error_msg}), 500
-        flash(error_msg, 'danger')
+        flash('添加记录失败，请重试。', 'danger')
+        print(f"Error: {str(e)}")
         return redirect(url_for('health_records'))
 
 if __name__ == '__main__':

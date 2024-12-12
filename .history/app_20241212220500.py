@@ -107,7 +107,7 @@ def register():
 
         # 验证密码是否匹配
         if password != confirm_password:
-            flash('两次输入的密码不一致', 'danger')
+            flash('���次输入的密码不一致', 'danger')
             return redirect(url_for('register'))
 
         # 验证用户名是否已存在
@@ -835,7 +835,7 @@ def add_health_record():
         if not record_date_str:
             raise ValueError('记录日期不能为空')
         record_date = datetime.strptime(record_date_str, '%Y-%m-%d')
-        logger.info(f"记录日���: {record_date}")
+        logger.info(f"记录日期: {record_date}")
         
         # 创建新记录
         new_record = HealthRecord(
@@ -850,6 +850,8 @@ def add_health_record():
             blood_pressure=f"{request.form.get('blood_pressure_sys', '')}/{request.form.get('blood_pressure_dia', '')}",
             heart_rate=request.form.get('heart_rate', type=int),
             blood_sugar=request.form.get('blood_sugar', type=float),
+            blood_routine=request.form.get('blood_routine'),
+            urine_routine=request.form.get('urine_routine'),
             liver_function=request.form.get('liver_function'),
             kidney_function=request.form.get('kidney_function'),
             temperature=request.form.get('body_temperature', type=float)

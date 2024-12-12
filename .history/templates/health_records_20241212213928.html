@@ -109,9 +109,9 @@
                         <div class="col-md-6">
                             <label class="form-label">记录类型</label>
                             <select class="form-select" name="record_type" required>
-                                <option value="PHYSICAL_EXAM">体检报告</option>
-                                <option value="MEDICAL_HISTORY">病史记录</option>
-                                <option value="DAILY_MONITOR">日常监测</option>
+                                <option value="体检报告">体检报告</option>
+                                <option value="病史记录">病史记录</option>
+                                <option value="日常监测">日常监测</option>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -166,6 +166,14 @@
 
                     <!-- 检查结果 -->
                     <h6 class="mb-3">检查结果</h6>
+                    <div class="mb-3">
+                        <label class="form-label">血常规</label>
+                        <textarea class="form-control" name="blood_routine" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">尿常规</label>
+                        <textarea class="form-control" name="urine_routine" rows="2"></textarea>
+                    </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label">肝功能</label>
@@ -251,80 +259,75 @@
 </style>
 
 <script>
-// 添加健康记录的处理函数
-document.getElementById('addRecordForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    try {
-        console.log('开始提交表单数据...');
-        const formData = new FormData(this);
-        
-        // 打印表单数据以便调试
-        for (let pair of formData.entries()) {
-            console.log(pair[0] + ': ' + pair[1]);
-        }
-        
-        const response = await fetch(this.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            credentials: 'same-origin'
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || '提交失败，请重试');
-        }
-
-        const result = await response.text();
-        console.log('提交成功，服务器响应:', result);
-        
-        // 显示成功消息
-        alert('记录添加成功！');
-        window.location.href = '/health_records';
-    } catch (error) {
-        console.error('错误详情:', error);
-        alert('提交失败: ' + (error.message || '网络错误，请检查网络连接后重试'));
-    }
-});
-
-// 查看记录的函数
+// 查看记录详情
 function viewRecord(recordId) {
-    try {
-        window.location.href = `/view_record/${recordId}`;
-    } catch (error) {
-        console.error('查看记录失败:', error);
-        alert('查看记录失败，请���试');
-    }
+    fetch(`/get_record/${recordId}`)
+        .then(response => response.json())
+        .then(data => {
+            // 构建记录详情HTML
+            const details = `
+                <div class="record-details">
+                    <h6>基本信息</h6>
+                    <p>记录类型：${data.record_type}</p>
+                    <p>记录日期：${data.record_date}</p>
+                    
+                    <h6 class="mt-4">体征数据</h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p>身高：${data.height || '--'} cm</p>
+                            <p>体重：${data.weight || '--'} kg</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p>血压：${data.blood_pressure_sys || '--'}/${data.blood_pressure_dia || '--'} mmHg</p>
+                            <p>心率：${data.heart_rate || '--'} 次/分</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p>血糖：${data.blood_sugar || '--'} mmol/L</p>
+                            <p>体温：${data.body_temperature || '--'} ℃</p>
+                        </div>
+                    </div>
+                    
+                    <h6 class="mt-4">症状描述</h6>
+                    <p>${data.symptoms || '无'}</p>
+                    
+                    <h6 class="mt-4">检查结果</h6>
+                    <p>血常规：${data.blood_routine || '无'}</p>
+                    <p>尿常规：${data.urine_routine || '无'}</p>
+                    <p>肝功能：${data.liver_function || '无'}</p>
+                    <p>肾功能：${data.kidney_function || '无'}</p>
+                    
+                    <h6 class="mt-4">备注说明</h6>
+                    <p>${data.description || '无'}</p>
+                </div>
+            `;
+            
+            document.getElementById('recordDetails').innerHTML = details;
+            new bootstrap.Modal(document.getElementById('viewRecordModal')).show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('获取记录详情失败');
+        });
 }
 
-// 删除记录的函数
-async function deleteRecord(recordId) {
-    if (!confirm('确定要删除这条记录吗？')) {
-        return;
-    }
-    
-    try {
-        const response = await fetch(`/delete_record/${recordId}`, {
+// 删除记录
+function deleteRecord(recordId) {
+    if (confirm('确定要删除这条记录吗？')) {
+        fetch(`/delete_record/${recordId}`, {
             method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Content-Type': 'application/json'
-            },
-            credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('删除失败：' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('删除记录失败');
         });
-
-        if (!response.ok) {
-            throw new Error('删除失败');
-        }
-
-        alert('记录已删除');
-        window.location.reload();
-    } catch (error) {
-        console.error('删除记录失败:', error);
-        alert('删除记录失败，请重试');
     }
 }
 

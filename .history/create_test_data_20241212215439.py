@@ -2,20 +2,17 @@ from app import app, db
 from models import User, HealthRecord, FollowUp
 from datetime import datetime, timedelta
 import random
-import os
 
 def create_test_data():
     """创建测试数据"""
     with app.app_context():
-        # 确保instance目录存在
-        if not os.path.exists('instance'):
-            os.makedirs('instance')
-            
-        # 删除所有表并重新创建
-        print("正在初始化数据库...")
-        db.drop_all()
-        db.create_all()
-        print("数据库初始化完成")
+        # 先清空数据库
+        print("正在清空数据库...")
+        db.session.query(FollowUp).delete()
+        db.session.query(HealthRecord).delete()
+        db.session.query(User).delete()
+        db.session.commit()
+        print("数据库已清空")
         
         # 创建医生用户
         doctor = User(

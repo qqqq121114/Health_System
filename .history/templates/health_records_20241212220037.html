@@ -166,6 +166,14 @@
 
                     <!-- 检查结果 -->
                     <h6 class="mb-3">检查结果</h6>
+                    <div class="mb-3">
+                        <label class="form-label">血常规</label>
+                        <textarea class="form-control" name="blood_routine" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">尿常规</label>
+                        <textarea class="form-control" name="urine_routine" rows="2"></textarea>
+                    </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label">肝功能</label>
@@ -296,7 +304,7 @@ function viewRecord(recordId) {
         window.location.href = `/view_record/${recordId}`;
     } catch (error) {
         console.error('查看记录失败:', error);
-        alert('查看记录失败，请���试');
+        alert('查看记录失败，请重试');
     }
 }
 

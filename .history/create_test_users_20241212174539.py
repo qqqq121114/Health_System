@@ -5,22 +5,22 @@ def create_test_users():
         # 创建医生账号
         doctor = User(
             username='doctor1',
-            name='张医生',
-            id_number='110101199001011234',
-            gender='男',
-            phone='13800138000',
-            role='DOCTOR'
+            email='doctor1@example.com',
+            role='doctor'
         )
         doctor.set_password('123456')
         
         # 创建患者账号
         patient = User(
             username='patient1',
-            name='王患者',
-            id_number='110101195001011234',
+            email='patient1@example.com',
+            role='patient',
+            age=65,
             gender='男',
-            phone='13900139000',
-            role='PATIENT'
+            phone='13800138000',
+            address='北京市朝阳区',
+            medical_history='高血压、糖尿病史',
+            main_symptoms='偶有头晕'
         )
         patient.set_password('123456')
         

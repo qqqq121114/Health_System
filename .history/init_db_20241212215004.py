@@ -1,14 +1,8 @@
 from flask import Flask
 from models import db, User, HealthRecord, FollowUp
 from datetime import datetime
-import os
 
 app = Flask(__name__)
-
-# 确保instance目录存在
-if not os.path.exists('instance'):
-    os.makedirs('instance')
-
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/health_records.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
