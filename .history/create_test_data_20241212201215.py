@@ -6,14 +6,6 @@ import random
 def create_test_data():
     """创建测试数据"""
     with app.app_context():
-        # 先清空数据库
-        print("正在清空数据库...")
-        db.session.query(FollowUp).delete()
-        db.session.query(HealthRecord).delete()
-        db.session.query(User).delete()
-        db.session.commit()
-        print("数据库已清空")
-        
         # 创建医生用户
         doctor = User(
             username='doctor1',
@@ -32,28 +24,52 @@ def create_test_data():
                 'name': '王大爷',
                 'id_number': '110101193001011234',
                 'gender': '男',
-                'phone': '13900139001'
+                'age': 75,
+                'phone': '13900139001',
+                'address': '北京市朝阳区建国路1号',
+                'medical_history': '高血压、糖尿病史',
+                'allergies': '青霉素过敏',
+                'emergency_contact': '王小明',
+                'emergency_phone': '13900139002'
             },
             {
                 'username': 'patient2',
                 'name': '李奶奶',
                 'id_number': '110101193501011234',
                 'gender': '女',
-                'phone': '13900139003'
+                'age': 70,
+                'phone': '13900139003',
+                'address': '北京市海淀区中关村大街1号',
+                'medical_history': '冠心病史',
+                'allergies': '无',
+                'emergency_contact': '李小红',
+                'emergency_phone': '13900139004'
             },
             {
                 'username': 'patient3',
                 'name': '张大叔',
                 'id_number': '110101196001011234',
                 'gender': '男',
-                'phone': '13900139005'
+                'age': 65,
+                'phone': '13900139005',
+                'address': '北京市西城区西单大街1号',
+                'medical_history': '胃病史',
+                'allergies': '海鲜过敏',
+                'emergency_contact': '张小强',
+                'emergency_phone': '13900139006'
             },
             {
                 'username': 'patient4',
                 'name': '赵婆婆',
                 'id_number': '110101194001011234',
                 'gender': '女',
-                'phone': '13900139007'
+                'age': 80,
+                'phone': '13900139007',
+                'address': '北京市东城区王府井大街1号',
+                'medical_history': '关节炎、高血压史',
+                'allergies': '无',
+                'emergency_contact': '赵小梅',
+                'emergency_phone': '13900139008'
             }
         ]
         
@@ -64,22 +80,25 @@ def create_test_data():
                 name=data['name'],
                 id_number=data['id_number'],
                 gender=data['gender'],
+                age=data['age'],
                 phone=data['phone'],
+                address=data['address'],
+                medical_history=data['medical_history'],
+                allergies=data['allergies'],
+                emergency_contact=data['emergency_contact'],
+                emergency_phone=data['emergency_phone'],
                 role='PATIENT'
             )
             patient.set_password('123456')
             patients.append(patient)
         
         # 添加用户到数据库
-        print("正在创建用户...")
         db.session.add(doctor)
         for patient in patients:
             db.session.add(patient)
         db.session.commit()
-        print("用户创建完成")
         
         # 创建健康记录
-        print("正在创建健康记录...")
         record_types = ['MEDICAL_HISTORY', 'PHYSICAL_EXAM', 'DAILY_MONITOR']
         for patient in patients:
             # 为每个患者创建3-5条记录
@@ -111,11 +130,8 @@ def create_test_data():
                     oxygen_saturation=random.uniform(95, 100) if record_type == 'DAILY_MONITOR' else None
                 )
                 db.session.add(record)
-        db.session.commit()
-        print("健康记录创建完成")
         
         # 创建复诊记录
-        print("正在创建复诊记录...")
         for patient in patients:
             follow_up = FollowUp(
                 patient_id=patient.id,
@@ -129,9 +145,8 @@ def create_test_data():
         
         # 提交所有更改
         db.session.commit()
-        print("复诊记录创建完成")
         
-        print('\n测试数据创建成功！')
+        print('测试数据创建成功！')
         print('\n医生账号：')
         print('用户名: doctor1')
         print('密码: 123456')

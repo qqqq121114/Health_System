@@ -293,26 +293,20 @@ def doctor_add_record():
             
             flash('健康记录添加成功！', 'success')
             
-            # 如果是 AJAX 请求，返回 JSON 响应
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # 返回JSON响应，包含更新后的就诊数
+            if request.is_xhr:
                 return jsonify({
                     'success': True,
                     'message': '记录添加成功',
                     'today_visits': today_visits
                 })
             
-            # 如果是普通表单提交，重定向到主页
-            return redirect(url_for('doctor_home'))
+            return redirect(url_for('doctor_patient_list'))
             
         except Exception as e:
             db.session.rollback()
             flash('添加记录失败，请重试。', 'danger')
             print(f"Error: {str(e)}")
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({
-                    'success': False,
-                    'message': str(e)
-                }), 500
             return redirect(url_for('doctor_add_record'))
     
     return render_template('doctor/add_record.html', patient=patient)
@@ -517,48 +511,7 @@ def check_patient(username):
 
 @app.route('/api/follow_up', methods=['POST'])
 @login_required
-def add_follow_up():
-    """添加复诊记录"""
-    if current_user.role != 'DOCTOR':
-        return jsonify({
-            'success': False,
-            'message': '无权进行此操作'
-        }), 403
-    
-    try:
-        patient_id = request.form.get('patient_id', type=int)
-        follow_up_date = datetime.strptime(request.form.get('follow_up_date'), '%Y-%m-%d')
-        reason = request.form.get('reason')
-        notes = request.form.get('notes')
-        
-        # 创建复诊记录
-        follow_up = FollowUp(
-            patient_id=patient_id,
-            doctor_id=current_user.id,
-            follow_up_date=follow_up_date,
-            reason=reason,
-            notes=notes,
-            status='pending'
-        )
-        
-        db.session.add(follow_up)
-        db.session.commit()
-        
-        return jsonify({
-            'success': True,
-            'message': '复诊预约已创建'
-        })
-        
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        }), 500
-
-@app.route('/api/follow_up/<int:follow_up_id>', methods=['POST'])
-@login_required
-def update_follow_up(follow_up_id):
+def update_follow_up():
     """更新复诊状态"""
     if current_user.role != 'DOCTOR':
         return jsonify({
@@ -567,9 +520,11 @@ def update_follow_up(follow_up_id):
         }), 403
     
     try:
-        status = request.form.get('status')
+        data = request.get_json()
+        follow_up_id = data.get('follow_up_id')
+        status = data.get('status')
         
-        if not status:
+        if not follow_up_id or not status:
             return jsonify({
                 'success': False,
                 'message': '参数不完整'

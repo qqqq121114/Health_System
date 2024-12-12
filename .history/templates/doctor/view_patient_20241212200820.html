@@ -17,7 +17,7 @@
             </a>
             <button type="button" 
                     class="btn btn-outline-primary"
-                    onclick="showFollowUpModal({{ patient.id }})">
+                    onclick="showFollowUpModal({{ patient.id }}, '{{ patient.name }}')">
                 <i class="fas fa-calendar-plus"></i> 预约复诊
             </button>
         </div>
@@ -115,7 +115,7 @@
                                     <th>记录类型</th>
                                     <th>记录日期</th>
                                     <th>主要指标</th>
-                                    <th>症状描述</th>
+                                    <th>症状/��述</th>
                                     <th>操作</th>
                                 </tr>
                             </thead>
@@ -223,7 +223,7 @@
     </div>
 </div>
 
-<!-- 复诊预约模态框 -->
+<!-- 预约复诊模态框 -->
 <div class="modal fade" id="followUpModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -233,24 +233,28 @@
             </div>
             <div class="modal-body">
                 <form id="followUpForm">
-                    <input type="hidden" name="patient_id" id="patientId" value="{{ patient.id }}">
+                    <input type="hidden" id="patientId" name="patient_id">
+                    <div class="mb-3">
+                        <label class="form-label">患者姓名</label>
+                        <input type="text" class="form-control" id="patientName" readonly>
+                    </div>
                     <div class="mb-3">
                         <label class="form-label">复诊日期</label>
                         <input type="date" class="form-control" name="follow_up_date" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">复诊原因</label>
-                        <input type="text" class="form-control" name="reason" required>
+                        <textarea class="form-control" name="reason" rows="3" required></textarea>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">注意事项</label>
-                        <textarea class="form-control" name="notes" rows="3"></textarea>
-                    </div>
-                    <div class="text-end">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                        <button type="submit" class="btn btn-primary">确定预约</button>
+                        <label class="form-label">备注说明</label>
+                        <textarea class="form-control" name="notes" rows="2"></textarea>
                     </div>
                 </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="submitFollowUp()">确认预约</button>
             </div>
         </div>
     </div>
@@ -332,16 +336,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // 显示预约复诊模态框
-function showFollowUpModal(patientId) {
-    const modal = new bootstrap.Modal(document.getElementById('followUpModal'));
+function showFollowUpModal(patientId, patientName) {
+    document.getElementById('patientId').value = patientId;
+    document.getElementById('patientName').value = patientName;
     document.querySelector('input[name="follow_up_date"]').valueAsDate = new Date();
+    
+    const modal = new bootstrap.Modal(document.getElementById('followUpModal'));
     modal.show();
 }
 
 // 提交复诊预约
-document.getElementById('followUpForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const formData = new FormData(this);
+function submitFollowUp() {
+    const form = document.getElementById('followUpForm');
+    const formData = new FormData(form);
     
     fetch('/api/follow_up', {
         method: 'POST',
@@ -363,7 +370,7 @@ document.getElementById('followUpForm').addEventListener('submit', function(even
         console.error('Error:', error);
         showAlert('danger', '操作失败，请重试');
     });
-});
+}
 
 // 完成复诊
 function completeFollowUp(followUpId) {

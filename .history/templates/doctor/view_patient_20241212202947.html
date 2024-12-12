@@ -17,7 +17,7 @@
             </a>
             <button type="button" 
                     class="btn btn-outline-primary"
-                    onclick="showFollowUpModal({{ patient.id }})">
+                    onclick="showFollowUpModal({{ patient.id }}, '{{ patient.name }}')">
                 <i class="fas fa-calendar-plus"></i> 预约复诊
             </button>
         </div>
@@ -54,7 +54,7 @@
                         <tr>
                             <th width="120">就诊次数：</th>
                             <td>{{ patient.get_visit_count() }}</td>
-                            <th width="120">最近就诊：</th>
+                            <th width="120">最近就���：</th>
                             <td>{{ patient.get_last_visit().strftime('%Y-%m-%d') if patient.get_last_visit() else '未就诊' }}</td>
                         </tr>
                         <tr>
@@ -232,8 +232,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="followUpForm">
-                    <input type="hidden" name="patient_id" id="patientId" value="{{ patient.id }}">
+                <form id="followUpForm" onsubmit="event.preventDefault(); addFollowUp();">
+                    <input type="hidden" name="patient_id" value="{{ patient.id }}">
                     <div class="mb-3">
                         <label class="form-label">复诊日期</label>
                         <input type="date" class="form-control" name="follow_up_date" required>
@@ -332,16 +332,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // 显示预约复诊模态框
-function showFollowUpModal(patientId) {
-    const modal = new bootstrap.Modal(document.getElementById('followUpModal'));
+function showFollowUpModal(patientId, patientName) {
+    document.getElementById('patientId').value = patientId;
+    document.getElementById('patientName').value = patientName;
     document.querySelector('input[name="follow_up_date"]').valueAsDate = new Date();
+    
+    const modal = new bootstrap.Modal(document.getElementById('followUpModal'));
     modal.show();
 }
 
 // 提交复诊预约
-document.getElementById('followUpForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const formData = new FormData(this);
+function submitFollowUp() {
+    const form = document.getElementById('followUpForm');
+    const formData = new FormData(form);
     
     fetch('/api/follow_up', {
         method: 'POST',
@@ -363,7 +366,7 @@ document.getElementById('followUpForm').addEventListener('submit', function(even
         console.error('Error:', error);
         showAlert('danger', '操作失败，请重试');
     });
-});
+}
 
 // 完成复诊
 function completeFollowUp(followUpId) {

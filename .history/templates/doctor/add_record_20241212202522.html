@@ -39,7 +39,7 @@
 
                         <!-- 基本信息 -->
                         <div class="mb-4">
-                            <h5>基本信息</h5>
+                            <h5>基��信息</h5>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
@@ -267,7 +267,7 @@
                                             <label class="form-label">心率 (次/分)</label>
                                             <input type="number" class="form-control" name="heart_rate" 
                                                    min="40" max="200">
-                                            <div class="form-text">正常范围：40-200</div>
+                                            <div class="form-text">正���范围：40-200</div>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
@@ -521,18 +521,20 @@ document.getElementById('recordForm').addEventListener('submit', function(e) {
     
     fetch('{{ url_for("doctor_add_record") }}', {
         method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        },
         body: formData
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            // 更新今日就诊数
+            document.querySelector('.today-visits').textContent = data.today_visits;
+            document.querySelector('.visits-notification').textContent = 
+                `已完成 ${data.today_visits} 位患者就诊`;
+            
             // 显示成功消息
             alert('记录添加成功！');
-            // 跳转到医生主页
-            window.location.href = '{{ url_for("doctor_home") }}';
+            // 跳转到患者列表页面
+            window.location.href = '{{ url_for("doctor_patient_list") }}';
         } else {
             alert('添加记录失败：' + data.message);
         }

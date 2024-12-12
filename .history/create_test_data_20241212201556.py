@@ -6,14 +6,6 @@ import random
 def create_test_data():
     """创建测试数据"""
     with app.app_context():
-        # 先清空数据库
-        print("正在清空数据库...")
-        db.session.query(FollowUp).delete()
-        db.session.query(HealthRecord).delete()
-        db.session.query(User).delete()
-        db.session.commit()
-        print("数据库已清空")
-        
         # 创建医生用户
         doctor = User(
             username='doctor1',
@@ -71,15 +63,12 @@ def create_test_data():
             patients.append(patient)
         
         # 添加用户到数据库
-        print("正在创建用户...")
         db.session.add(doctor)
         for patient in patients:
             db.session.add(patient)
         db.session.commit()
-        print("用户创建完成")
         
         # 创建健康记录
-        print("正在创建健康记录...")
         record_types = ['MEDICAL_HISTORY', 'PHYSICAL_EXAM', 'DAILY_MONITOR']
         for patient in patients:
             # 为每个患者创建3-5条记录
@@ -111,11 +100,8 @@ def create_test_data():
                     oxygen_saturation=random.uniform(95, 100) if record_type == 'DAILY_MONITOR' else None
                 )
                 db.session.add(record)
-        db.session.commit()
-        print("健康记录创建完成")
         
         # 创建复诊记录
-        print("正在创建复诊记录...")
         for patient in patients:
             follow_up = FollowUp(
                 patient_id=patient.id,
@@ -129,9 +115,8 @@ def create_test_data():
         
         # 提交所有更改
         db.session.commit()
-        print("复诊记录创建完成")
         
-        print('\n测试数据创建成功！')
+        print('测试数据创建成功！')
         print('\n医生账号：')
         print('用户名: doctor1')
         print('密码: 123456')

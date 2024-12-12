@@ -511,36 +511,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-
-<!-- 表单提交脚本 -->
-<script>
-document.getElementById('recordForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    
-    fetch('{{ url_for("doctor_add_record") }}', {
-        method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // 显示成功消息
-            alert('记录添加成功！');
-            // 跳转到医生主页
-            window.location.href = '{{ url_for("doctor_home") }}';
-        } else {
-            alert('添加记录失败：' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('添加记录失败，请重试');
-    });
-});
-</script>
 {% endblock %} 

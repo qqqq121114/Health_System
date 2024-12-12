@@ -30,7 +30,7 @@ migrate = Migrate(app, db)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-login_manager.login_message = '请先登录后再���问此页面'
+login_manager.login_message = '请先登录后再访问此页面'
 login_manager.login_message_category = 'info'
 
 @login_manager.user_loader
@@ -191,7 +191,7 @@ def doctor_home():
         func.date(HealthRecord.record_date) == today_date
     ).count()
     
-    # 获取待复诊数量
+    # 获取待复���数量
     follow_up_count = FollowUp.query.filter_by(
         doctor_id=current_user.id,
         status='pending'
@@ -262,11 +262,17 @@ def doctor_add_record():
                 doctor_id=current_user.id,
                 record_type=record_type,
                 record_date=record_date,
+                
+                # 通用字段
                 description=request.form.get('description'),
+                
+                # 病史记录字段
                 symptoms=request.form.get('symptoms'),
                 diagnosis=request.form.get('diagnosis'),
                 treatment=request.form.get('treatment'),
                 medications=request.form.get('medications'),
+                
+                # 体检报告字段
                 height=request.form.get('height', type=float),
                 weight=request.form.get('weight', type=float),
                 blood_pressure=f"{request.form.get('blood_pressure_sys', '')}/{request.form.get('blood_pressure_dia', '')}",
@@ -275,6 +281,8 @@ def doctor_add_record():
                 blood_fat=request.form.get('blood_fat'),
                 liver_function=request.form.get('liver_function'),
                 kidney_function=request.form.get('kidney_function'),
+                
+                # 日常监测字段
                 temperature=request.form.get('temperature', type=float),
                 pulse=request.form.get('pulse', type=int),
                 respiratory_rate=request.form.get('respiratory_rate', type=int),
@@ -284,35 +292,13 @@ def doctor_add_record():
             db.session.add(new_record)
             db.session.commit()
             
-            # 获取更新后的今日就诊数
-            today_date = datetime.now().date()
-            today_visits = HealthRecord.query.filter(
-                HealthRecord.doctor_id == current_user.id,
-                func.date(HealthRecord.record_date) == today_date
-            ).count()
-            
             flash('健康记录添加成功！', 'success')
-            
-            # 如果是 AJAX 请求，返回 JSON 响应
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({
-                    'success': True,
-                    'message': '记录添加成功',
-                    'today_visits': today_visits
-                })
-            
-            # 如果是普通表单提交，重定向到主页
-            return redirect(url_for('doctor_home'))
+            return redirect(url_for('doctor_patient_list'))
             
         except Exception as e:
             db.session.rollback()
             flash('添加记录失败，请重试。', 'danger')
             print(f"Error: {str(e)}")
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({
-                    'success': False,
-                    'message': str(e)
-                }), 500
             return redirect(url_for('doctor_add_record'))
     
     return render_template('doctor/add_record.html', patient=patient)
@@ -336,7 +322,7 @@ def doctor_patient_list():
     # 构建查询
     query = User.query.filter_by(role='PATIENT')
     
-    # 如果是"我的患者"，只显示有就诊记录的患者
+    # 如果是"我的患者"，只显示有就诊��录的患者
     if filter_type == 'my_patients':
         query = query.join(HealthRecord, User.id == HealthRecord.patient_id)\
             .filter(HealthRecord.doctor_id == current_user.id)\
@@ -517,48 +503,7 @@ def check_patient(username):
 
 @app.route('/api/follow_up', methods=['POST'])
 @login_required
-def add_follow_up():
-    """添加复诊记录"""
-    if current_user.role != 'DOCTOR':
-        return jsonify({
-            'success': False,
-            'message': '无权进行此操作'
-        }), 403
-    
-    try:
-        patient_id = request.form.get('patient_id', type=int)
-        follow_up_date = datetime.strptime(request.form.get('follow_up_date'), '%Y-%m-%d')
-        reason = request.form.get('reason')
-        notes = request.form.get('notes')
-        
-        # 创建复诊记录
-        follow_up = FollowUp(
-            patient_id=patient_id,
-            doctor_id=current_user.id,
-            follow_up_date=follow_up_date,
-            reason=reason,
-            notes=notes,
-            status='pending'
-        )
-        
-        db.session.add(follow_up)
-        db.session.commit()
-        
-        return jsonify({
-            'success': True,
-            'message': '复诊预约已创建'
-        })
-        
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        }), 500
-
-@app.route('/api/follow_up/<int:follow_up_id>', methods=['POST'])
-@login_required
-def update_follow_up(follow_up_id):
+def update_follow_up():
     """更新复诊状态"""
     if current_user.role != 'DOCTOR':
         return jsonify({
@@ -567,9 +512,11 @@ def update_follow_up(follow_up_id):
         }), 403
     
     try:
-        status = request.form.get('status')
+        data = request.get_json()
+        follow_up_id = data.get('follow_up_id')
+        status = data.get('status')
         
-        if not status:
+        if not follow_up_id or not status:
             return jsonify({
                 'success': False,
                 'message': '参数不完整'

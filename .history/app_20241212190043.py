@@ -30,7 +30,7 @@ migrate = Migrate(app, db)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-login_manager.login_message = '请先登录后再���问此页面'
+login_manager.login_message = '请先登录后再访问此页面'
 login_manager.login_message_category = 'info'
 
 @login_manager.user_loader
@@ -191,7 +191,7 @@ def doctor_home():
         func.date(HealthRecord.record_date) == today_date
     ).count()
     
-    # 获取待复诊数量
+    # 获取待复���数量
     follow_up_count = FollowUp.query.filter_by(
         doctor_id=current_user.id,
         status='pending'
@@ -262,11 +262,17 @@ def doctor_add_record():
                 doctor_id=current_user.id,
                 record_type=record_type,
                 record_date=record_date,
+                
+                # 通用字段
                 description=request.form.get('description'),
+                
+                # 病史记录字段
                 symptoms=request.form.get('symptoms'),
                 diagnosis=request.form.get('diagnosis'),
                 treatment=request.form.get('treatment'),
                 medications=request.form.get('medications'),
+                
+                # 体检报告字段
                 height=request.form.get('height', type=float),
                 weight=request.form.get('weight', type=float),
                 blood_pressure=f"{request.form.get('blood_pressure_sys', '')}/{request.form.get('blood_pressure_dia', '')}",
@@ -275,6 +281,8 @@ def doctor_add_record():
                 blood_fat=request.form.get('blood_fat'),
                 liver_function=request.form.get('liver_function'),
                 kidney_function=request.form.get('kidney_function'),
+                
+                # 日常监测字段
                 temperature=request.form.get('temperature', type=float),
                 pulse=request.form.get('pulse', type=int),
                 respiratory_rate=request.form.get('respiratory_rate', type=int),
@@ -284,35 +292,13 @@ def doctor_add_record():
             db.session.add(new_record)
             db.session.commit()
             
-            # 获取更新后的今日就诊数
-            today_date = datetime.now().date()
-            today_visits = HealthRecord.query.filter(
-                HealthRecord.doctor_id == current_user.id,
-                func.date(HealthRecord.record_date) == today_date
-            ).count()
-            
             flash('健康记录添加成功！', 'success')
-            
-            # 如果是 AJAX 请求，返回 JSON 响应
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({
-                    'success': True,
-                    'message': '记录添加成功',
-                    'today_visits': today_visits
-                })
-            
-            # 如果是普通表单提交，重定向到主页
-            return redirect(url_for('doctor_home'))
+            return redirect(url_for('doctor_patient_list'))
             
         except Exception as e:
             db.session.rollback()
             flash('添加记录失败，请重试。', 'danger')
             print(f"Error: {str(e)}")
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({
-                    'success': False,
-                    'message': str(e)
-                }), 500
             return redirect(url_for('doctor_add_record'))
     
     return render_template('doctor/add_record.html', patient=patient)
@@ -480,7 +466,7 @@ def doctor_view_patient(patient_id):
                         blood_sugar_data=blood_sugar_data,
                         weight_data=weight_data)
 
-# API路由
+# API路���
 @app.route('/api/check_patient/<username>')
 @login_required
 def check_patient(username):
@@ -537,8 +523,7 @@ def add_follow_up():
             doctor_id=current_user.id,
             follow_up_date=follow_up_date,
             reason=reason,
-            notes=notes,
-            status='pending'
+            notes=notes
         )
         
         db.session.add(follow_up)
@@ -547,61 +532,6 @@ def add_follow_up():
         return jsonify({
             'success': True,
             'message': '复诊预约已创建'
-        })
-        
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        }), 500
-
-@app.route('/api/follow_up/<int:follow_up_id>', methods=['POST'])
-@login_required
-def update_follow_up(follow_up_id):
-    """更新复诊状态"""
-    if current_user.role != 'DOCTOR':
-        return jsonify({
-            'success': False,
-            'message': '无权操作'
-        }), 403
-    
-    try:
-        status = request.form.get('status')
-        
-        if not status:
-            return jsonify({
-                'success': False,
-                'message': '参数不完整'
-            }), 400
-        
-        follow_up = FollowUp.query.get_or_404(follow_up_id)
-        
-        # 检查是否是该医生的复诊记录
-        if follow_up.doctor_id != current_user.id:
-            return jsonify({
-                'success': False,
-                'message': '无权操作此记录'
-            }), 403
-        
-        # 更新状态
-        follow_up.status = status
-        # 如果是确认完成，更新完成时间
-        if status == 'completed':
-            follow_up.completed_at = datetime.now()
-        
-        db.session.commit()
-        
-        # 获取更新后的待复诊数量
-        pending_follow_ups = FollowUp.query.filter_by(
-            doctor_id=current_user.id,
-            status='pending'
-        ).count()
-        
-        return jsonify({
-            'success': True,
-            'message': '更新成功',
-            'pending_count': pending_follow_ups
         })
         
     except Exception as e:
@@ -712,90 +642,6 @@ def get_health_record(record_id):
             'success': False,
             'message': str(e)
         }), 500
-
-@app.route('/api/health_record/<int:record_id>', methods=['DELETE'])
-@login_required
-def delete_health_record(record_id):
-    """删除健康记录"""
-    if current_user.role != 'DOCTOR':
-        return jsonify({
-            'success': False,
-            'message': '无权删除记录'
-        }), 403
-    
-    try:
-        record = HealthRecord.query.get_or_404(record_id)
-        
-        # 检查是否是该医生的记录
-        if record.doctor_id != current_user.id:
-            return jsonify({
-                'success': False,
-                'message': '无权删除此记录'
-            }), 403
-        
-        db.session.delete(record)
-        db.session.commit()
-        
-        return jsonify({
-            'success': True,
-            'message': '记录已删除'
-        })
-        
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        }), 500
-
-@app.route('/doctor/edit_record/<int:record_id>', methods=['GET', 'POST'])
-@login_required
-def edit_health_record(record_id):
-    """编辑健康记录"""
-    if current_user.role != 'DOCTOR':
-        flash('无权访问此页面', 'danger')
-        return redirect(url_for('index'))
-    
-    record = HealthRecord.query.get_or_404(record_id)
-    
-    # 检查是否是该医生的记录
-    if record.doctor_id != current_user.id:
-        flash('无权编辑此记录', 'danger')
-        return redirect(url_for('doctor_home'))
-    
-    if request.method == 'POST':
-        try:
-            # 更新记录
-            record.record_type = request.form.get('record_type')
-            record.record_date = datetime.strptime(request.form.get('record_date'), '%Y-%m-%d')
-            record.description = request.form.get('description')
-            record.symptoms = request.form.get('symptoms')
-            record.diagnosis = request.form.get('diagnosis')
-            record.treatment = request.form.get('treatment')
-            record.medications = request.form.get('medications')
-            record.height = request.form.get('height', type=float)
-            record.weight = request.form.get('weight', type=float)
-            record.blood_pressure = f"{request.form.get('blood_pressure_sys', '')}/{request.form.get('blood_pressure_dia', '')}"
-            record.heart_rate = request.form.get('heart_rate', type=int)
-            record.blood_sugar = request.form.get('blood_sugar', type=float)
-            record.blood_fat = request.form.get('blood_fat')
-            record.liver_function = request.form.get('liver_function')
-            record.kidney_function = request.form.get('kidney_function')
-            record.temperature = request.form.get('temperature', type=float)
-            record.pulse = request.form.get('pulse', type=int)
-            record.respiratory_rate = request.form.get('respiratory_rate', type=int)
-            record.oxygen_saturation = request.form.get('oxygen_saturation', type=float)
-            
-            db.session.commit()
-            flash('记录更新成功！', 'success')
-            return redirect(url_for('doctor_view_patient', patient_id=record.patient_id))
-            
-        except Exception as e:
-            db.session.rollback()
-            flash('更新记录失败，请重试。', 'danger')
-            print(f"Error: {str(e)}")
-    
-    return render_template('doctor/edit_record.html', record=record)
 
 if __name__ == '__main__':
     app.run(debug=True) 
