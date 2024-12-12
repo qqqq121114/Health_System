@@ -179,57 +179,54 @@ def personal_advice():
 @app.route('/doctor/home')
 @login_required
 def doctor_home():
-    """医生工作台首页"""
+    """医生主页"""
     if current_user.role != 'DOCTOR':
         flash('无权访问此页面', 'danger')
         return redirect(url_for('index'))
     
     # 获取今日日期
-    today = datetime.now()
-    today_date = today.date()
+    today = datetime.now().date()
     
-    # 获取今日就诊数
-    today_visits = HealthRecord.query.filter(
+    # 获取今日记录数
+    today_records = HealthRecord.query.filter(
         HealthRecord.doctor_id == current_user.id,
-        func.date(HealthRecord.record_date) == today_date
+        func.date(HealthRecord.created_at) == today
     ).count()
     
-    # 获取待复诊数量
-    follow_up_count = FollowUp.query.filter_by(
+    # 获取本月记录数
+    month_records = HealthRecord.query.filter(
+        HealthRecord.doctor_id == current_user.id,
+        func.extract('month', HealthRecord.created_at) == today.month,
+        func.extract('year', HealthRecord.created_at) == today.year
+    ).count()
+    
+    # 获取管理的患者总数
+    total_patients = User.query.join(
+        HealthRecord, User.id == HealthRecord.patient_id
+    ).filter(
+        User.role == 'PATIENT',
+        HealthRecord.doctor_id == current_user.id
+    ).distinct().count()
+    
+    # 获取最近记录
+    recent_records = HealthRecord.query.filter_by(
+        doctor_id=current_user.id
+    ).order_by(
+        HealthRecord.created_at.desc()
+    ).limit(5).all()
+    
+    # 待复诊数量
+    pending_appointments = FollowUp.query.filter_by(
         doctor_id=current_user.id,
         status='pending'
     ).count()
     
-    # 获取本月新增患者数
-    new_patients_month = User.query.filter(
-        User.role == 'PATIENT',
-        func.extract('month', User.created_at) == today.month,
-        func.extract('year', User.created_at) == today.year
-    ).count()
-    
-    # 获取总患者数和我的患者数
-    total_patients = User.query.filter_by(role='PATIENT').count()
-    my_patients = User.query.filter_by(role='PATIENT')\
-        .join(HealthRecord, User.id == HealthRecord.patient_id)\
-        .filter(HealthRecord.doctor_id == current_user.id)\
-        .distinct().count()
-    
-    # 获取最近就诊记录（包含患者信息）
-    recent_records = HealthRecord.query\
-        .join(User, HealthRecord.patient_id == User.id)\
-        .filter(HealthRecord.doctor_id == current_user.id)\
-        .order_by(HealthRecord.record_date.desc())\
-        .limit(10)\
-        .all()
-    
     return render_template('doctor_home.html',
-                         today=today,
-                         today_visits=today_visits,
-                         follow_up_count=follow_up_count,
-                         new_patients_month=new_patients_month,
-                         total_patients=total_patients,
-                         my_patients=my_patients,
-                         recent_records=recent_records)
+                        today_records=today_records,
+                        month_records=month_records,
+                        total_patients=total_patients,
+                        pending_appointments=pending_appointments,
+                        recent_records=recent_records)
 
 @app.route('/doctor/add_record', methods=['GET', 'POST'])
 @login_required
@@ -238,12 +235,6 @@ def doctor_add_record():
     if current_user.role != 'DOCTOR':
         flash('无权访问此页面', 'danger')
         return redirect(url_for('index'))
-    
-    # 获取患者ID（如果从患者列表页面跳转）
-    patient_id = request.args.get('patient_id', type=int)
-    patient = None
-    if patient_id:
-        patient = User.query.filter_by(id=patient_id, role='PATIENT').first()
     
     if request.method == 'POST':
         try:
@@ -304,7 +295,7 @@ def doctor_add_record():
             print(f"Error: {str(e)}")
             return redirect(url_for('doctor_add_record'))
     
-    return render_template('doctor/add_record.html', patient=patient)
+    return render_template('doctor/add_record.html')
 
 @app.route('/doctor/patient_list')
 @login_required
@@ -318,38 +309,12 @@ def doctor_patient_list():
     page = request.args.get('page', 1, type=int)
     per_page = 10
     
-    # 获取筛选参数
-    filter_type = request.args.get('filter', 'all')  # all, my_patients
-    search_query = request.args.get('search', '')
-    
-    # 构建查询
-    query = User.query.filter_by(role='PATIENT')
-    
-    # 如果是"我的患者"，只显示有就诊记录的患者
-    if filter_type == 'my_patients':
-        query = query.join(HealthRecord, User.id == HealthRecord.patient_id)\
-            .filter(HealthRecord.doctor_id == current_user.id)\
-            .distinct()
-    
-    # 如果有搜索关键词，添加搜索条件
-    if search_query:
-        query = query.filter(
-            db.or_(
-                User.name.like(f'%{search_query}%'),
-                User.phone.like(f'%{search_query}%'),
-                User.id_number.like(f'%{search_query}%')
-            )
-        )
-    
     # 获取患者列表
-    patients = query.paginate(page=page, per_page=per_page, error_out=False)
+    patients = User.query.filter_by(role='PATIENT')\
+        .paginate(page=page, per_page=per_page, error_out=False)
     
     # 获取统计数据
     total_patients = User.query.filter_by(role='PATIENT').count()
-    my_patients = User.query.filter_by(role='PATIENT')\
-        .join(HealthRecord, User.id == HealthRecord.patient_id)\
-        .filter(HealthRecord.doctor_id == current_user.id)\
-        .distinct().count()
     
     # 获取本月新增患者数
     today = datetime.now().date()
@@ -376,12 +341,9 @@ def doctor_patient_list():
                         pages=patients.pages,
                         page=page,
                         total_patients=total_patients,
-                        my_patients=my_patients,
                         new_patients_month=new_patients_month,
                         follow_up_count=follow_up_count,
-                        today_visits=today_visits,
-                        filter_type=filter_type,
-                        search_query=search_query)
+                        today_visits=today_visits)
 
 @app.route('/doctor/view_patient/<int:patient_id>')
 @login_required
@@ -409,7 +371,7 @@ def doctor_view_patient(patient_id):
         HealthRecord.created_at.desc()
     ).first()
     
-    # 获取患者的最新日常监测数据
+    # 获取患��的最新日常监测数据
     latest_monitor = HealthRecord.query.filter_by(
         patient_id=patient.id,
         record_type='DAILY_MONITOR'
@@ -471,38 +433,18 @@ def doctor_view_patient(patient_id):
 
 # API路由
 @app.route('/api/check_patient/<username>')
-@login_required
 def check_patient(username):
-    """检查患者信息的 API"""
-    if current_user.role != 'DOCTOR':
+    """检查患者是否存在并返回患者信息"""
+    patient = User.query.filter_by(username=username, role='PATIENT').first()
+    if patient:
         return jsonify({
-            'success': False,
-            'message': '无权访问此 API'
-        }), 403
-    
-    try:
-        patient = User.query.filter_by(username=username, role='PATIENT').first()
-        
-        if patient:
-            return jsonify({
-                'success': True,
-                'patient': {
-                    'id': patient.id,
-                    'username': patient.username,
-                    'name': patient.name
-                }
-            })
-        else:
-            return jsonify({
-                'success': False,
-                'message': '未找到患者'
-            })
-            
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        }), 500
+            'exists': True,
+            'name': patient.name
+        })
+    return jsonify({
+        'exists': False,
+        'name': None
+    })
 
 @app.route('/api/follow_up', methods=['POST'])
 @login_required

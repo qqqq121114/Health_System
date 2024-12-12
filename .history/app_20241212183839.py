@@ -30,7 +30,7 @@ migrate = Migrate(app, db)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-login_manager.login_message = '请先登录后再访问此页面'
+login_manager.login_message = '请先登录后再���问此页面'
 login_manager.login_message_category = 'info'
 
 @login_manager.user_loader
@@ -184,14 +184,11 @@ def doctor_home():
         flash('无权访问此页面', 'danger')
         return redirect(url_for('index'))
     
-    # 获取今日日期
-    today = datetime.now()
-    today_date = today.date()
-    
     # 获取今日就诊数
+    today = datetime.now().date()
     today_visits = HealthRecord.query.filter(
         HealthRecord.doctor_id == current_user.id,
-        func.date(HealthRecord.record_date) == today_date
+        func.date(HealthRecord.record_date) == today
     ).count()
     
     # 获取待复诊数量
@@ -223,7 +220,6 @@ def doctor_home():
         .all()
     
     return render_template('doctor_home.html',
-                         today=today,
                          today_visits=today_visits,
                          follow_up_count=follow_up_count,
                          new_patients_month=new_patients_month,
@@ -304,7 +300,10 @@ def doctor_add_record():
             print(f"Error: {str(e)}")
             return redirect(url_for('doctor_add_record'))
     
-    return render_template('doctor/add_record.html', patient=patient)
+    # 获取当前日期
+    today = datetime.now()
+    
+    return render_template('doctor/add_record.html', patient=patient, today=today)
 
 @app.route('/doctor/patient_list')
 @login_required
