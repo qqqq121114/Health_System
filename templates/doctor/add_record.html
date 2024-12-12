@@ -1,0 +1,570 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">添加健康记录</h3>
+                    <form method="POST" action="{{ url_for('doctor_add_record') }}" id="recordForm">
+                        <!-- 患者信息 -->
+                        <div class="mb-4">
+                            <label class="form-label">患者姓名</label>
+                            <input type="text" class="form-control" name="patient_username" required>
+                            <div class="form-text">请输入患者的用户名</div>
+                        </div>
+
+                        <!-- 基本信息 -->
+                        <div class="mb-4">
+                            <h5>基本信息</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">记录类型</label>
+                                        <select class="form-select" name="record_type" id="recordType" required>
+                                            <option value="">请选择记录类型</option>
+                                            <option value="病史记录">病史记录</option>
+                                            <option value="体检报告">体检报告</option>
+                                            <option value="日常监测">日常监测</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">记录日期</label>
+                                        <input type="date" class="form-control" name="record_date" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 病史记录表单 -->
+                        <div id="medicalHistoryForm" class="record-form" style="display: none;">
+                            <!-- 主诉 -->
+                            <div class="mb-4">
+                                <h5>主诉</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">主要症状</label>
+                                    <textarea class="form-control" name="symptoms" rows="3" 
+                                            placeholder="请详细描述患者的主要症状、持续时间等"></textarea>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">发病时间</label>
+                                            <input type="date" class="form-control" name="onset_date">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">症状程度</label>
+                                            <select class="form-select" name="severity">
+                                                <option value="轻度">轻度</option>
+                                                <option value="中度">中度</option>
+                                                <option value="重度">重度</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 现病史 -->
+                            <div class="mb-4">
+                                <h5>现病史</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">病情发展经过</label>
+                                    <textarea class="form-control" name="illness_history" rows="3"
+                                            placeholder="请描述疾病的发展过程、治疗经过等"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">治疗情况</label>
+                                    <textarea class="form-control" name="treatment_history" rows="2"
+                                            placeholder="请描述已经采取的治疗措施及效果"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- 既往史 -->
+                            <div class="mb-4">
+                                <h5>既往史</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">疾病史</label>
+                                            <textarea class="form-control" name="disease_history" rows="2"
+                                                    placeholder="既往疾病、手术、外伤等"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">过敏史</label>
+                                            <textarea class="form-control" name="allergy_history" rows="2"
+                                                    placeholder="药物或其他过敏情况"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">家族病史</label>
+                                    <textarea class="form-control" name="family_history" rows="2"
+                                            placeholder="家族遗传病史或相关疾病史"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- 体格检查 -->
+                            <div class="mb-4">
+                                <h5>体格检查</h5>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">体温 (℃)</label>
+                                            <input type="number" class="form-control" name="body_temperature" 
+                                                   step="0.1" min="35" max="42">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">脉搏 (次/分)</label>
+                                            <input type="number" class="form-control" name="pulse" 
+                                                   min="40" max="200">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">收缩压 (mmHg)</label>
+                                            <input type="number" class="form-control" name="blood_pressure_sys" 
+                                                   min="60" max="250">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">舒张压 (mmHg)</label>
+                                            <input type="number" class="form-control" name="blood_pressure_dia" 
+                                                   min="40" max="150">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">体格检查记录</label>
+                                    <textarea class="form-control" name="physical_examination" rows="3"
+                                            placeholder="请记录体格检查的具体发现"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- 诊断和治疗计划 -->
+                            <div class="mb-4">
+                                <h5>诊断与治疗</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">初步诊断</label>
+                                    <textarea class="form-control" name="diagnosis" rows="2"
+                                            placeholder="请填写诊断结果"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">治疗方案</label>
+                                    <textarea class="form-control" name="treatment_plan" rows="3"
+                                            placeholder="请详细描述治疗方案"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">用药建议</label>
+                                    <textarea class="form-control" name="medication_advice" rows="3"
+                                            placeholder="请填写具体用药建议，包括药品名称、用量、用法等"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">注意事项</label>
+                                    <textarea class="form-control" name="precautions" rows="2"
+                                            placeholder="需要特别注意的事项"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- 随访计划 -->
+                            <div class="mb-4">
+                                <h5>随访计划</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">建议复诊日期</label>
+                                            <input type="date" class="form-control" name="follow_up_date">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">复诊项目</label>
+                                            <input type="text" class="form-control" name="follow_up_items"
+                                                   placeholder="需要复查的项目">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 体检报告表单 -->
+                        <div id="physicalExamForm" class="record-form" style="display: none;">
+                            <!-- 基础体格检查 -->
+                            <div class="mb-4">
+                                <h5>基础体格检查</h5>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">身高 (cm)</label>
+                                            <input type="number" class="form-control" name="height" 
+                                                   step="0.1" min="100" max="250">
+                                            <div class="form-text">正常范围：100-250</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">体重 (kg)</label>
+                                            <input type="number" class="form-control" name="weight" 
+                                                   step="0.1" min="20" max="200">
+                                            <div class="form-text">正常范围：20-200</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">BMI</label>
+                                            <input type="number" class="form-control" name="bmi" readonly>
+                                            <div class="form-text">自动计算</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">体温 (℃)</label>
+                                            <input type="number" class="form-control" name="body_temperature" 
+                                                   step="0.1" min="35" max="42">
+                                            <div class="form-text">正常范围：36.3-37.2</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 生命体征 -->
+                            <div class="mb-4">
+                                <h5>生命体征</h5>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">血压-收缩压 (mmHg)</label>
+                                            <input type="number" class="form-control" name="blood_pressure_sys" 
+                                                   min="60" max="250">
+                                            <div class="form-text">正常范围：90-140</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">血压-舒张压 (mmHg)</label>
+                                            <input type="number" class="form-control" name="blood_pressure_dia" 
+                                                   min="40" max="150">
+                                            <div class="form-text">正常范围：60-90</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">心率 (次/分)</label>
+                                            <input type="number" class="form-control" name="heart_rate" 
+                                                   min="40" max="180">
+                                            <div class="form-text">正常范围：60-100</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">呼吸频率 (次/分)</label>
+                                            <input type="number" class="form-control" name="respiratory_rate" 
+                                                   min="10" max="40">
+                                            <div class="form-text">正常范围：16-20</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 实验室检查 -->
+                            <div class="mb-4">
+                                <h5>实验室检查</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">血常规</label>
+                                            <textarea class="form-control" name="blood_routine" rows="3"
+                                                    placeholder="请输入血常规检查结果，包括血红蛋白、白细胞、血小板等指标"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">尿常规</label>
+                                            <textarea class="form-control" name="urine_routine" rows="3"
+                                                    placeholder="请输入尿常规检查结果，包括尿蛋白、尿糖、尿潜血等指标"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">肝功能</label>
+                                            <textarea class="form-control" name="liver_function" rows="3"
+                                                    placeholder="请输入肝功能检查结果，包括转氨酶、胆红素等指标"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">肾功能</label>
+                                            <textarea class="form-control" name="kidney_function" rows="3"
+                                                    placeholder="请输入肾功能检查结果，包括肌酐、尿素氮等指标"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">血脂</label>
+                                            <textarea class="form-control" name="blood_lipids" rows="3"
+                                                    placeholder="请输入血脂检查结果，包括总胆固醇、甘油三酯等指标"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 其他检查 -->
+                            <div class="mb-4">
+                                <h5>其他检查</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">影像学检查</label>
+                                    <textarea class="form-control" name="imaging_results" rows="3"
+                                            placeholder="请输入X光、CT、磁共振等影像学检查结果"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">心电图检查</label>
+                                    <textarea class="form-control" name="ecg_results" rows="3"
+                                            placeholder="请输入心电图检查结果"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">其他检查结果</label>
+                                    <textarea class="form-control" name="other_exam_results" rows="3"
+                                            placeholder="请输入其他检查结果和说明"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- 体检结论 -->
+                            <div class="mb-4">
+                                <h5>体检结论</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">异常发现</label>
+                                    <textarea class="form-control" name="abnormal_findings" rows="3"
+                                            placeholder="请描述体检中发现的异常情况"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">建议</label>
+                                    <textarea class="form-control" name="recommendations" rows="3"
+                                            placeholder="请填写健康建议和注意事项"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 日常监测表单 -->
+                        <div id="dailyMonitoringForm" class="record-form" style="display: none;">
+                            <!-- 基础生命体征 -->
+                            <div class="mb-4">
+                                <h5>基础生命体征</h5>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">体温 (℃)</label>
+                                            <input type="number" class="form-control" name="body_temperature" 
+                                                   step="0.1" min="35" max="42">
+                                            <div class="form-text">正常范围：36.3-37.2</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">脉搏 (次/分)</label>
+                                            <input type="number" class="form-control" name="pulse" 
+                                                   min="40" max="200">
+                                            <div class="form-text">正常范围：60-100</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">收缩压 (mmHg)</label>
+                                            <input type="number" class="form-control" name="blood_pressure_sys" 
+                                                   min="60" max="250">
+                                            <div class="form-text">正常范围：90-140</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">舒张压 (mmHg)</label>
+                                            <input type="number" class="form-control" name="blood_pressure_dia" 
+                                                   min="40" max="150">
+                                            <div class="form-text">正常范围：60-90</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 血糖监测 -->
+                            <div class="mb-4">
+                                <h5>血糖监测</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">空腹血糖 (mmol/L)</label>
+                                            <input type="number" class="form-control" name="fasting_blood_sugar" 
+                                                   step="0.1" min="2" max="30">
+                                            <div class="form-text">正常范围：3.9-6.1</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">餐后2小时血糖 (mmol/L)</label>
+                                            <input type="number" class="form-control" name="postprandial_blood_sugar" 
+                                                   step="0.1" min="2" max="30">
+                                            <div class="form-text">正常范围：< 7.8</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">测量时间</label>
+                                            <input type="time" class="form-control" name="blood_sugar_time">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 用药记录 -->
+                            <div class="mb-4">
+                                <h5>用药记录</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">服用药物</label>
+                                    <textarea class="form-control" name="medications" rows="3"
+                                            placeholder="请记录服用的药物名称、剂量和时间"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- 症状记录 -->
+                            <div class="mb-4">
+                                <h5>症状记录</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">不适症状</label>
+                                    <textarea class="form-control" name="symptoms" rows="3"
+                                            placeholder="请描述当前出现的不适症状"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- 生活方式记录 -->
+                            <div class="mb-4">
+                                <h5>生活方式记录</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">饮食情况</label>
+                                            <textarea class="form-control" name="diet_record" rows="2"
+                                                    placeholder="请记录今日饮食情况"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">运动情况</label>
+                                            <textarea class="form-control" name="exercise_record" rows="2"
+                                                    placeholder="请记录运动类型和时长"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">睡眠情况</label>
+                                            <textarea class="form-control" name="sleep_record" rows="2"
+                                                    placeholder="请记录睡眠时长和质量"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 提交按钮 -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary">保存记录</button>
+                            <button type="button" class="btn btn-secondary ms-2" onclick="history.back()">返回</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+h5 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.mb-4 {
+    margin-bottom: 2rem !important;
+}
+
+textarea.form-control {
+    min-height: 60px;
+}
+
+.form-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 设置当前日期为默认日期
+    document.querySelector('input[name="record_date"]').valueAsDate = new Date();
+    
+    // 根据记录类型显示相应的表单
+    const recordType = document.getElementById('recordType');
+    const medicalHistoryForm = document.getElementById('medicalHistoryForm');
+    const physicalExamForm = document.getElementById('physicalExamForm');
+    const dailyMonitoringForm = document.getElementById('dailyMonitoringForm');
+    
+    recordType.addEventListener('change', function() {
+        // 隐藏所有表单
+        medicalHistoryForm.style.display = 'none';
+        physicalExamForm.style.display = 'none';
+        dailyMonitoringForm.style.display = 'none';
+
+        // 显示选中的表单
+        switch(this.value) {
+            case '病史记录':
+                medicalHistoryForm.style.display = 'block';
+                break;
+            case '体检报告':
+                physicalExamForm.style.display = 'block';
+                break;
+            case '日常监测':
+                dailyMonitoringForm.style.display = 'block';
+                break;
+        }
+    });
+
+    // 计算BMI
+    const heightInput = document.querySelector('input[name="height"]');
+    const weightInput = document.querySelector('input[name="weight"]');
+    const bmiInput = document.querySelector('input[name="bmi"]');
+
+    function calculateBMI() {
+        if (heightInput.value && weightInput.value) {
+            const height = heightInput.value / 100; // 转换为米
+            const weight = weightInput.value;
+            const bmi = (weight / (height * height)).toFixed(1);
+            bmiInput.value = bmi;
+        }
+    }
+
+    heightInput?.addEventListener('input', calculateBMI);
+    weightInput?.addEventListener('input', calculateBMI);
+});
+</script>
+{% endblock %} 

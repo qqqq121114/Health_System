@@ -156,7 +156,6 @@ class HealthRecord(db.Model):
         }
 
 class FollowUp(db.Model):
-    __tablename__ = 'follow_up'
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     doctor_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
@@ -226,7 +225,7 @@ def register():
             flash('邮箱已被注册', 'danger')
             return redirect(url_for('register'))
         
-        # ��证角色是否有效
+        # 验证角色是否有效
         if role not in ['patient', 'doctor']:
             flash('无效的用户角色', 'danger')
             return redirect(url_for('register'))
@@ -417,7 +416,7 @@ def delete_record(record_id):
         record = HealthRecord.query.get_or_404(record_id)
         # 确保用户只能删除自己的记录
         if record.user_id != current_user.id:
-            return jsonify({'error': '无权删除此记录'}), 403
+            return jsonify({'error': '无��删除此记录'}), 403
             
         db.session.delete(record)
         db.session.commit()
@@ -511,6 +510,20 @@ PATIENT_STATUS = {
     'ACTIVE': 'active',     # 正常就诊
     'FOLLOW_UP': 'follow_up', # 待复诊
 }
+
+# 添加复诊预约模型
+class FollowUp(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    follow_up_date = db.Column(db.DateTime, nullable=False)
+    reason = db.Column(db.Text, nullable=False)
+    notes = db.Column(db.Text)
+    status = db.Column(db.String(20), default='pending')  # pending, completed, cancelled
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    patient = db.relationship('User', foreign_keys=[patient_id], backref='follow_ups')
+    doctor = db.relationship('User', foreign_keys=[doctor_id], backref='doctor_follow_ups')
 
 # 医生相关路由
 @app.route('/doctor/patients')

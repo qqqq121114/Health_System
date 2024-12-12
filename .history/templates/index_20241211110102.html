@@ -39,9 +39,9 @@
                             <tbody>
                                 {% for record in recent_records %}
                                 <tr>
-                                    <td>{{ record.patient.username }}</td>
-                                    <td>{{ record.record_type }}</td>
-                                    <td>{{ record.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>{{ record.patient_name }}</td>
+                                    <td>{{ record.type }}</td>
+                                    <td>{{ record.created_at }}</td>
                                     <td>
                                         <button class="btn btn-sm btn-info">查看</button>
                                     </td>

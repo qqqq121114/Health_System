@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="doctor-dashboard">
+    <!-- 顶部统计卡片 -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">今日记录数</h6>
+                            <h2 class="card-title mb-0">{{ today_records }}</h2>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-notes-medical"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">待处理预约</h6>
+                            <h2 class="card-title mb-0">{{ pending_appointments }}</h2>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">本月记录数</h6>
+                            <h2 class="card-title mb-0">{{ month_records }}</h2>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">管理患者数</h6>
+                            <h2 class="card-title mb-0">{{ total_patients }}</h2>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 快捷操作和通知 -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">快捷操作</h5>
+                    <div class="quick-actions mt-3">
+                        <a href="{{ url_for('doctor_add_record') }}" class="btn btn-primary me-2">
+                            <i class="fas fa-plus-circle me-1"></i> 添加健康记录
+                        </a>
+                        <a href="#" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-user-plus me-1"></i> 添加患者
+                        </a>
+                        <a href="#" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-calendar-plus me-1"></i> 创建预约
+                        </a>
+                        <a href="#" class="btn btn-outline-primary">
+                            <i class="fas fa-file-medical-alt me-1"></i> 查看报告
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">系统通知</h5>
+                    <div class="notifications mt-3">
+                        <div class="alert alert-info">
+                            <small class="text-muted">今天 09:00</small>
+                            <p class="mb-0">您有3个新的预约申请待处理</p>
+                        </div>
+                        <div class="alert alert-warning">
+                            <small class="text-muted">昨天 15:30</small>
+                            <p class="mb-0">2个患者的随访提醒</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 最近记录和患者列表 -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">最近添加的记录</h5>
+                        <a href="#" class="btn btn-sm btn-link">查看全部</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>患者姓名</th>
+                                    <th>记录类型</th>
+                                    <th>记录时间</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in recent_records %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm me-2">{{ record.patient.username[0] }}</div>
+                                            <div>{{ record.patient.username }}</div>
+                                        </div>
+                                    </td>
+                                    <td>{{ record.record_type }}</td>
+                                    <td>{{ record.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>
+                                        <span class="badge bg-success">已完成</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1">查看</button>
+                                        <button class="btn btn-sm btn-outline-secondary">编辑</button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">最近患者</h5>
+                        <a href="#" class="btn btn-sm btn-link">查看全部</a>
+                    </div>
+                    <div class="patient-list">
+                        {% for patient in recent_patients %}
+                        <div class="patient-item d-flex align-items-center p-2 border-bottom">
+                            <div class="avatar-sm me-3">{{ patient.username[0] }}</div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">{{ patient.username }}</h6>
+                                <small class="text-muted">上次就诊: {{ patient.last_visit }}</small>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary">查看</button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* 医生工作台样式 */
+.doctor-dashboard {
+    padding: 20px 0;
+}
+
+/* 统计卡片样式 */
+.stat-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.05);
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    background-color: rgba(0,123,255,0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #007bff;
+}
+
+/* 头像样式 */
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+    background-color: #e9ecef;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #495057;
+}
+
+/* 快捷操作按钮样式 */
+.quick-actions .btn {
+    padding: 8px 16px;
+    margin-bottom: 8px;
+}
+
+/* 表格样式 */
+.table {
+    font-size: 14px;
+}
+
+.table th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+}
+
+/* 患者列表样式 */
+.patient-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.patient-item {
+    transition: background-color 0.2s;
+}
+
+.patient-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* 通知样式 */
+.notifications .alert {
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+.notifications small {
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .stat-card {
+        margin-bottom: 15px;
+    }
+    
+    .quick-actions .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+</style>
+
+<!-- Font Awesome -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+{% endblock %} 

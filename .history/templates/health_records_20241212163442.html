@@ -19,7 +19,7 @@
                     <select class="form-select" id="recordType">
                         <option value="">全部类型</option>
                         <option value="体检报告">体检报告</option>
-                        <option value="病史记录">病史记录</option>
+                        <option value="就诊记录">就诊记录</option>
                         <option value="日常监测">日常监测</option>
                     </select>
                 </div>
@@ -110,7 +110,7 @@
                             <label class="form-label">记录类型</label>
                             <select class="form-select" name="record_type" required>
                                 <option value="体检报告">体检报告</option>
-                                <option value="病史记录">病史记录</option>
+                                <option value="就诊记录">就诊记录</option>
                                 <option value="日常监测">日常监测</option>
                             </select>
                         </div>
@@ -334,21 +334,6 @@ function deleteRecord(recordId) {
 // 日期选择器默认值
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('input[name="record_date"]').valueAsDate = new Date();
-});
-
-// 记录类型筛选功能
-document.getElementById('recordType').addEventListener('change', function() {
-    const selectedType = this.value;
-    const rows = document.querySelectorAll('tbody tr');
-    
-    rows.forEach(row => {
-        const typeCell = row.cells[0].textContent;
-        if (!selectedType || typeCell === selectedType) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    });
 });
 </script>
 {% endblock %} 

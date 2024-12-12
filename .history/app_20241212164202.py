@@ -1,16 +1,3 @@
-# 定义常量
-RECORD_TYPES = {
-    'PHYSICAL_EXAM': '体检报告',
-    'MEDICAL_HISTORY': '病史记录',
-    'DAILY_MONITOR': '日常监测'
-}
-
-PATIENT_STATUS = {
-    'NEW': 'new',           # 新患者
-    'ACTIVE': 'active',     # 正常就诊
-    'FOLLOW_UP': 'follow_up', # 待复诊
-}
-
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -67,7 +54,6 @@ class User(UserMixin, db.Model):
                                    lazy=True,
                                    foreign_keys='HealthRecord.doctor_id')
     
-    # 患者信息字段
     age = db.Column(db.Integer)
     gender = db.Column(db.String(10))
     phone = db.Column(db.String(20))
@@ -75,15 +61,6 @@ class User(UserMixin, db.Model):
     medical_history = db.Column(db.Text)
     main_symptoms = db.Column(db.Text)
     status = db.Column(db.String(20), default=PATIENT_STATUS['NEW'])
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-    def is_doctor(self):
-        return self.role == 'doctor'
     
     def get_visit_count(self):
         return HealthRecord.query.filter_by(user_id=self.id).count()
@@ -93,37 +70,47 @@ class User(UserMixin, db.Model):
             .order_by(HealthRecord.created_at.desc()).first()
         return last_record.created_at if last_record else None
 
+# 加记录类型常量
+RECORD_TYPES = {
+    'PHYSICAL_EXAM': '体检报告',
+    'MEDICAL_HISTORY': '病史记录',
+    'DAILY_MONITOR': '日常监测'
+}
+
 class HealthRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-    doctor_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='SET NULL'))
+    doctor_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='SET NULL'))  # 添加医生ID字段
     
     # 基本信息
-    record_type = db.Column(db.String(50), nullable=False)
-    record_date = db.Column(db.DateTime, nullable=False)
+    record_type = db.Column(db.String(50), nullable=False)  # 记录类型：体检报告、病史记录、日常监测
+    record_date = db.Column(db.DateTime, nullable=False)    # 记录日期
     
     # 体征数据
-    height = db.Column(db.Float)
-    weight = db.Column(db.Float)
-    blood_pressure_sys = db.Column(db.Integer)
-    blood_pressure_dia = db.Column(db.Integer)
-    heart_rate = db.Column(db.Integer)
-    blood_sugar = db.Column(db.Float)
-    body_temperature = db.Column(db.Float)
+    height = db.Column(db.Float)           # 身高（厘米）
+    weight = db.Column(db.Float)           # 体重（公斤）
+    blood_pressure_sys = db.Column(db.Integer)  # 收缩压
+    blood_pressure_dia = db.Column(db.Integer)  # 舒张压
+    heart_rate = db.Column(db.Integer)     # 心率
+    blood_sugar = db.Column(db.Float)      # 血糖
+    body_temperature = db.Column(db.Float)  # 体温
     
     # 实验室检查
-    blood_routine = db.Column(db.Text)
-    urine_routine = db.Column(db.Text)
-    liver_function = db.Column(db.Text)
-    kidney_function = db.Column(db.Text)
-    blood_lipids = db.Column(db.Text)
+    blood_routine = db.Column(db.Text)     # 血常规
+    urine_routine = db.Column(db.Text)     # 尿常规
+    liver_function = db.Column(db.Text)    # 肝功能
+    kidney_function = db.Column(db.Text)   # 肾功能
+    blood_lipids = db.Column(db.Text)      # 血脂
     
     # 其他信息
-    symptoms = db.Column(db.Text)
-    diagnosis = db.Column(db.Text)
-    treatment = db.Column(db.Text)
-    medications = db.Column(db.Text)
-    description = db.Column(db.Text)
+    symptoms = db.Column(db.Text)          # 症状描述
+    diagnosis = db.Column(db.Text)         # 诊断结果
+    treatment = db.Column(db.Text)         # 治疗方案
+    medications = db.Column(db.Text)       # 用药情况
+    description = db.Column(db.Text)       # 其他描述
+    
+    # 附件信息
+    attachments = db.Column(db.Text)       # 附件路径（JSON格式存储）
     
     # 记录信息
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -151,23 +138,10 @@ class HealthRecord(db.Model):
             'treatment': self.treatment,
             'medications': self.medications,
             'description': self.description,
+            'attachments': self.attachments,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M'),
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M')
         }
-
-class FollowUp(db.Model):
-    __tablename__ = 'follow_up'
-    id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-    doctor_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-    follow_up_date = db.Column(db.DateTime, nullable=False)
-    reason = db.Column(db.Text, nullable=False)
-    notes = db.Column(db.Text)
-    status = db.Column(db.String(20), default='pending')  # pending, completed, cancelled
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    patient = db.relationship('User', foreign_keys=[patient_id], backref='follow_ups')
-    doctor = db.relationship('User', foreign_keys=[doctor_id], backref='doctor_follow_ups')
 
 def init_db():
     with app.app_context():
@@ -226,7 +200,7 @@ def register():
             flash('邮箱已被注册', 'danger')
             return redirect(url_for('register'))
         
-        # ��证角色是否有效
+        # 验证角色是否有效
         if role not in ['patient', 'doctor']:
             flash('无效的用户角色', 'danger')
             return redirect(url_for('register'))
@@ -511,6 +485,20 @@ PATIENT_STATUS = {
     'ACTIVE': 'active',     # 正常就诊
     'FOLLOW_UP': 'follow_up', # 待复诊
 }
+
+# 添加复诊预约模型
+class FollowUp(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    follow_up_date = db.Column(db.DateTime, nullable=False)
+    reason = db.Column(db.Text, nullable=False)
+    notes = db.Column(db.Text)
+    status = db.Column(db.String(20), default='pending')  # pending, completed, cancelled
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    patient = db.relationship('User', foreign_keys=[patient_id], backref='follow_ups')
+    doctor = db.relationship('User', foreign_keys=[doctor_id], backref='doctor_follow_ups')
 
 # 医生相关路由
 @app.route('/doctor/patients')

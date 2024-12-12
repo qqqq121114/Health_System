@@ -21,9 +21,9 @@
                 <ul class="navbar-nav me-auto">
                     {% if current_user.is_authenticated %}
                         {% if current_user.is_doctor() %}
-                            <!-- 医生菜�� -->
+                            <!-- 医生菜单 -->
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('index') }}">医生工作台</a>
+                                <a class="nav-link" href="{{ url_for('doctor_dashboard') }}">医生工作台</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ url_for('doctor_add_record') }}">添加记录</a>
@@ -54,7 +54,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             {% if current_user.is_doctor() %}
-                                <li><a class="dropdown-item" href="{{ url_for('index') }}">工作台</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('doctor_dashboard') }}">工作台</a></li>
                             {% else %}
                                 <li><a class="dropdown-item" href="{{ url_for('health_records') }}">我的档案</a></li>
                             {% endif %}
