@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>健康风险评估</h2>
+            <hr>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            {% if not risks %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> 暂无健康风险数据，请先添加健康记录。
+            </div>
+            {% else %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">风险评估结果</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>指标类型</th>
+                                    <th>风险等级</th>
+                                    <th>建议</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for risk in risks %}
+                                <tr>
+                                    <td>{{ risk.type }}</td>
+                                    <td>
+                                        <span class="badge {% if risk.level == '高' %}bg-danger{% else %}bg-warning{% endif %}">
+                                            {{ risk.level }}
+                                        </span>
+                                    </td>
+                                    <td>{{ risk.description }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 健康建议 -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">健康建议</h5>
+                    <div class="alert alert-success">
+                        <h6><i class="fas fa-heartbeat"></i> 定期监测</h6>
+                        <p>建议定期监测血压、血糖等重要指标，保持良好的记录习惯。</p>
+                    </div>
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-walking"></i> 适度运动</h6>
+                        <p>每天进行适度运动，如散步、太极等，但注意不要过度。</p>
+                    </div>
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-utensils"></i> 饮食建议</h6>
+                        <p>保持均衡饮食，控制盐分和糖分的摄入，多吃蔬菜水果。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

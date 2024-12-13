@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- 左侧导航栏 -->
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="#nutrition" class="list-group-item list-group-item-action active" data-bs-toggle="list">
+                    <i class="fas fa-apple-alt"></i> 营养健康
+                </a>
+                <a href="#exercise" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="fas fa-running"></i> 运动锻炼
+                </a>
+                <a href="#disease" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="fas fa-heartbeat"></i> 疾病预防
+                </a>
+                <a href="#mental" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="fas fa-brain"></i> 心理健康
+                </a>
+            </div>
+        </div>
+
+        <!-- 右侧内容区 -->
+        <div class="col-md-9">
+            <div class="tab-content">
+                <!-- 营养健康 -->
+                <div class="tab-pane fade show active" id="nutrition">
+                    <h2 class="mb-4">营养健康</h2>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">均衡饮食的重要性</h5>
+                            <p class="card-text">合理的营养搭配对老年人的健康至关重要。建议：</p>
+                            <ul>
+                                <li>每天摄入充足的蛋白质，如瘦肉、鱼、蛋、豆制品等</li>
+                                <li>多吃新鲜蔬菜和水果，补充维生素和膳食纤维</li>
+                                <li>适量摄入全谷物，保证碳水化合物的供应</li>
+                                <li>控制盐分和油脂的摄入，预防心血管疾病</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 运动锻炼 -->
+                <div class="tab-pane fade" id="exercise">
+                    <h2 class="mb-4">运动锻炼</h2>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">适合老年人的运动方式</h5>
+                            <p class="card-text">规律运动可以增强体质，预防疾病。推荐以下运动：</p>
+                            <ul>
+                                <li>散步：每天30-60分钟，可分次进行</li>
+                                <li>太极拳：改善平衡能力，增强肌力</li>
+                                <li>游泳：减轻关节负担的有氧运动</li>
+                                <li>广场舞：增进社交，提高心肺功能</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 疾病预防 -->
+                <div class="tab-pane fade" id="disease">
+                    <h2 class="mb-4">疾病预防</h2>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">常见疾病的预防措施</h5>
+                            <p class="card-text">预防胜于治疗，注意以下几点：</p>
+                            <ul>
+                                <li>定期体检，早发现早治疗</li>
+                                <li>保持良好的生活习惯，规律作息</li>
+                                <li>注意保暖，预防感冒等疾病</li>
+                                <li>保持居住环境清洁，预防传染病</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 心理健康 -->
+                <div class="tab-pane fade" id="mental">
+                    <h2 class="mb-4">心理健康</h2>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">保持积极乐观的心态</h5>
+                            <p class="card-text">心理健康对老年人的生活质量很重要：</p>
+                            <ul>
+                                <li>保持社交活动，避免孤独</li>
+                                <li>培养兴趣爱好，丰富生活</li>
+                                <li>与家人保持良好沟通</li>
+                                <li>适当参与社区活动</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.list-group-item {
+    border: none;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.5rem !important;
+}
+
+.list-group-item.active {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.list-group-item i {
+    margin-right: 0.5rem;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,.05);
+    border-radius: 0.5rem;
+}
+
+.tab-content {
+    padding: 1rem;
+}
+
+h2 {
+    color: var(--bs-primary);
+    font-weight: 600;
+}
+</style>
+{% endblock %} 

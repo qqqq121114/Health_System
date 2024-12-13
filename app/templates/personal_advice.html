@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- 左侧导航栏 -->
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="#overview" class="list-group-item list-group-item-action active" data-bs-toggle="list">
+                    <i class="fas fa-chart-line"></i> 健康概览
+                </a>
+                <a href="#advice" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="fas fa-comment-medical"></i> 健康建议
+                </a>
+                <a href="#plan" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="fas fa-calendar-check"></i> 健康计划
+                </a>
+                <a href="#reminder" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="fas fa-bell"></i> 健康提醒
+                </a>
+            </div>
+        </div>
+
+        <!-- 右侧内容区 -->
+        <div class="col-md-9">
+            <div class="tab-content">
+                <!-- 健康概览 -->
+                <div class="tab-pane fade show active" id="overview">
+                    <h2 class="mb-4">健康概览</h2>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">最近体征</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-borderless">
+                                            <tr>
+                                                <td>血压</td>
+                                                <td>120/80 mmHg</td>
+                                            </tr>
+                                            <tr>
+                                                <td>心率</td>
+                                                <td>75 次/分</td>
+                                            </tr>
+                                            <tr>
+                                                <td>血糖</td>
+                                                <td>5.6 mmol/L</td>
+                                            </tr>
+                                            <tr>
+                                                <td>体重</td>
+                                                <td>65 kg</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">健康趋势</h5>
+                                    <canvas id="healthTrend"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 健康建议 -->
+                <div class="tab-pane fade" id="advice">
+                    <h2 class="mb-4">健康建议</h2>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">生活方式建议</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-3">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    保持规律作息，每天保证7-8小时睡眠
+                                </li>
+                                <li class="mb-3">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    适量运动，建议每天步行30分钟
+                                </li>
+                                <li class="mb-3">
+                                    <i class="fas fa-exclamation-circle text-warning"></i>
+                                    注意控制饮食，减少高盐高脂食物摄入
+                                </li>
+                                <li class="mb-3">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    保持心情愉悦，多参与社交活动
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 健康计划 -->
+                <div class="tab-pane fade" id="plan">
+                    <h2 class="mb-4">健康计划</h2>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">本周计划</h5>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>时间</th>
+                                            <th>项目</th>
+                                            <th>状态</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>周一</td>
+                                            <td>晨练、血压监测</td>
+                                            <td><span class="badge bg-success">已完成</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>周二</td>
+                                            <td>游泳、血糖监测</td>
+                                            <td><span class="badge bg-warning">进行中</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>周三</td>
+                                            <td>太极拳、体重监测</td>
+                                            <td><span class="badge bg-secondary">待完成</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 健康提醒 -->
+                <div class="tab-pane fade" id="reminder">
+                    <h2 class="mb-4">健康提醒</h2>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">待办事项</h5>
+                            <div class="list-group">
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">复诊提醒</h6>
+                                        <small class="text-muted">3天后</small>
+                                    </div>
+                                    <p class="mb-1">心血管科复诊</p>
+                                </div>
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">用药提醒</h6>
+                                        <small class="text-muted">每天</small>
+                                    </div>
+                                    <p class="mb-1">早晚各服用降压药1次</p>
+                                </div>
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">体检提醒</h6>
+                                        <small class="text-muted">2周后</small>
+                                    </div>
+                                    <p class="mb-1">年度体检</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.list-group-item {
+    border: none;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.5rem !important;
+}
+
+.list-group-item.active {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.list-group-item i {
+    margin-right: 0.5rem;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,.05);
+    border-radius: 0.5rem;
+}
+
+.tab-content {
+    padding: 1rem;
+}
+
+h2 {
+    color: var(--bs-primary);
+    font-weight: 600;
+}
+
+.table td {
+    padding: 0.75rem;
+    vertical-align: middle;
+}
+
+.badge {
+    font-weight: normal;
+    padding: 0.5em 0.8em;
+}
+</style>
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// 健康趋势图表
+const ctx = document.getElementById('healthTrend').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+        datasets: [{
+            label: '血压',
+            data: [120, 118, 122, 119, 121, 120, 118],
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: false
+            }
+        }
+    }
+});
+</script>
+{% endblock %} 

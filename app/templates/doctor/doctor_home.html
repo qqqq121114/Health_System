@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- 左侧导航栏 -->
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <div class="position-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('doctor.home') }}">
+                            <i class="fas fa-home"></i> 工作台
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('doctor.add_record') }}">
+                            <i class="fas fa-plus-circle"></i> 添加记录
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- 主要内容区域 -->
+        <main class="col-md-10 ms-sm-auto px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">医生工作台</h1>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="row">
+                <div class="col-md-3 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">今日就诊</h5>
+                            <p class="card-text display-4">{{ today_visits }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">待复诊</h5>
+                            <p class="card-text display-4">{{ follow_up_count }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">本月新增患者</h5>
+                            <p class="card-text display-4">{{ new_patients_month }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">我的患者</h5>
+                            <p class="card-text display-4">{{ my_patients }}/{{ total_patients }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 最近就诊记录 -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">最近就诊记录</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>就诊日期</th>
+                                            <th>患者姓名</th>
+                                            <th>就诊类型</th>
+                                            <th>主要症状</th>
+                                            <th>诊断结果</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for record in recent_records %}
+                                        <tr>
+                                            <td>{{ record.record_date.strftime('%Y-%m-%d') }}</td>
+                                            <td>{{ record.patient.name }}</td>
+                                            <td>{{ record.record_type }}</td>
+                                            <td>{{ record.symptoms[:30] + '...' if record.symptoms and record.symptoms|length > 30 else record.symptoms }}</td>
+                                            <td>{{ record.diagnosis[:30] + '...' if record.diagnosis and record.diagnosis|length > 30 else record.diagnosis }}</td>
+                                            <td>
+                                                <a href="{{ url_for('doctor.view_patient', patient_id=record.patient_id) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i> 查看
+                                                </a>
+                                                <a href="{{ url_for('doctor.edit_record', record_id=record.id) }}" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-edit"></i> 编辑
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %} 
