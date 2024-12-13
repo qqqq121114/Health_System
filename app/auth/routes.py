@@ -8,7 +8,7 @@ from . import auth_bp
 def login():
     """登录页面"""
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     if request.method == 'POST':
         username = request.form.get('username')
@@ -20,7 +20,7 @@ def login():
             login_user(user, remember=remember)
             next_page = request.args.get('next')
             flash('登录成功！', 'success')
-            return redirect(next_page or url_for('index'))
+            return redirect(next_page or url_for('main.index'))
         else:
             flash('用户名或密码错误', 'danger')
     
@@ -28,9 +28,9 @@ def login():
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    """��册页面"""
+    """注册页面"""
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     if request.method == 'POST':
         username = request.form.get('username')
@@ -94,4 +94,4 @@ def logout():
     """退出登录"""
     logout_user()
     flash('已成功退出登录', 'success')
-    return redirect(url_for('index')) 
+    return redirect(url_for('main.index')) 

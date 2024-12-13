@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>健康分析</h2>
+            <hr>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 健康趋势卡片 -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-line text-primary"></i>
+                        健康趋势
+                    </h5>
+                    <p class="card-text">查看您的血压、血糖、心率和体重等健康指标的变化趋势。</p>
+                    <a href="{{ url_for('analysis.health_trends') }}" class="btn btn-primary">
+                        查看趋势
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 风险评估卡片 -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                        风险评估
+                    </h5>
+                    <p class="card-text">基于您的最新健康数据，评估潜在的健康风险并提供建议。</p>
+                    <a href="{{ url_for('analysis.risk_assessment') }}" class="btn btn-warning">
+                        查看评估
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 健康统计卡片 -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-calculator text-success"></i>
+                        健康统计
+                    </h5>
+                    <p class="card-text">查看您的各项健康指标的统计数据，包括平均值、最高值和最低值。</p>
+                    <a href="{{ url_for('analysis.health_stats') }}" class="btn btn-success">
+                        查看统计
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 健康提示 -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-lightbulb text-info"></i>
+                        健康小贴士
+                    </h5>
+                    <div class="alert alert-info">
+                        <ul class="mb-0">
+                            <li>定期记录您的健康数据，有助于更好地了解您的健康状况</li>
+                            <li>关注健康趋势的变化，及时发现潜在的健康问题</li>
+                            <li>根据风险评估结果，采取相应的预防措施</li>
+                            <li>如有异常情况，请及时咨询医生</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

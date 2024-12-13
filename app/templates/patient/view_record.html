@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">健康记录详情</h5>
+                    <a href="{{ url_for('patient.health_records') }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-arrow-left"></i> 返回列表
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">记录日期</h6>
+                            <p>{{ record.record_date.strftime('%Y-%m-%d') }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">记录类型</h6>
+                            <p>{{ record.record_type }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h6 class="text-muted">症状描述</h6>
+                            <p>{{ record.symptoms or '无' }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">身高</h6>
+                            <p>{{ record.height }} cm</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">体重</h6>
+                            <p>{{ record.weight }} kg</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">血压</h6>
+                            <p>{{ record.blood_pressure or '未记录' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">心率</h6>
+                            <p>{{ record.heart_rate or '未记录' }} 次/分</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">血糖</h6>
+                            <p>{{ record.blood_sugar or '未记录' }} mmol/L</p>
+                        </div>
+                    </div>
+
+                    {% if record.doctor_id %}
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h6 class="text-muted">医生诊断</h6>
+                            <p>{{ record.diagnosis or '无' }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

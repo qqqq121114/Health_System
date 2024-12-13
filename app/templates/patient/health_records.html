@@ -44,7 +44,7 @@
             <div class="collapse mb-3" id="filterPanel">
                 <div class="card">
                     <div class="card-body">
-                        <form id="filterForm">
+                        <form id="filterForm" method="POST">
                             <div class="row">
                                 <div class="col-md-3">
                                     <label class="form-label">记录类型</label>
@@ -142,7 +142,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="addRecordForm" action="{{ url_for('patient.add_health_record') }}" method="POST">
+                <form id="addRecordForm" method="POST" action="{{ url_for('patient.add_health_record') }}">
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label">记录类型</label>
@@ -231,6 +231,7 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
 {% block scripts %}
 <script>
@@ -248,133 +249,56 @@ document.getElementById('filterForm').addEventListener('submit', function(e) {
     const params = new URLSearchParams();
     
     // 处理记录类型
-    const recordType = formData.get('record_type');
-    if (recordType) {
-        params.append('record_type', recordType);
+    for (let [key, value] of formData.entries()) {
+        if (value) {
+            params.append(key, value);
+        }
     }
     
-    // 处理时间范围
-    const timeRange = formData.get('time_range');
-    if (timeRange) {
-        params.append('time_range', timeRange);
-    } else {
-        // 如果没有选择预定义时间范围，则处理自定义日期范围
-        const startDate = formData.get('start_date');
-        const endDate = formData.get('end_date');
-        if (startDate) params.append('start_date', startDate);
-        if (endDate) params.append('end_date', endDate);
-    }
-    
-    // 重定向到带有筛选参数的URL
-    window.location.href = `${window.location.pathname}?${params.toString()}`;
+    // 更新URL并重新加载页面
+    window.location.search = params.toString();
 });
 
-// 时间范围选择处理
-document.querySelector('select[name="time_range"]').addEventListener('change', function() {
-    const dateInputs = document.querySelectorAll('input[type="date"]');
-    const isPresetSelected = this.value !== '';
-    
-    // 如果选择了预定义时间范围，禁用并清空自定义日期输入
-    dateInputs.forEach(input => {
-        input.disabled = isPresetSelected;
-        if (isPresetSelected) {
-            input.value = '';
-        }
-    });
-});
-
-// 日期输入处理
-document.querySelectorAll('input[type="date"]').forEach(input => {
-    input.addEventListener('change', function() {
-        // 如果输入了日期，清空预定义时间范围选择
-        if (this.value) {
-            document.querySelector('select[name="time_range"]').value = '';
-        }
-    });
+// 导出功能
+document.getElementById('exportBtn').addEventListener('click', function() {
+    window.location.href = "{{ url_for('patient.export_health_records') }}";
 });
 
 // 删除记录
 function deleteRecord(recordId) {
     if (confirm('确定要删除这条记录吗？')) {
-        fetch(`{{ url_for('patient.delete_record', record_id=0) }}`.replace('0', recordId), {
+        fetch("{{ url_for('patient.delete_record', record_id=0) }}".replace('0', recordId), {
             method: 'POST',
             headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+                'Content-Type': 'application/json'
             }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();
             } else {
-                alert(data.message);
+                alert('删除失败，请稍后重试');
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('删除失败，请重试');
         });
     }
 }
 
-// 表单提交处理
-document.getElementById('addRecordForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    fetch(this.action, {
-        method: 'POST',
-        body: new FormData(this),
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
-        } else {
-            alert(data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('添加记录失败，请重试');
-    });
-});
-
-// 更新筛选状态显示
+// 显示筛选状态
 function updateFilterStatus() {
-    const urlParams = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(window.location.search);
     const filterStatus = document.getElementById('filterStatus');
     const filterStatusText = document.getElementById('filterStatusText');
     let statusText = [];
 
-    // 检查记录类型
-    const recordType = urlParams.get('record_type');
-    if (recordType) {
-        const recordTypeText = document.querySelector(`select[name="record_type"] option[value="${recordType}"]`).text;
-        statusText.push(`记录类型: ${recordTypeText}`);
+    if (params.has('record_type')) {
+        statusText.push(`记录类型: ${params.get('record_type')}`);
+    }
+    if (params.has('time_range')) {
+        statusText.push(`时间范围: ${params.get('time_range')}`);
+    }
+    if (params.has('start_date') && params.has('end_date')) {
+        statusText.push(`日期: ${params.get('start_date')} 至 ${params.get('end_date')}`);
     }
 
-    // 检查时间范围
-    const timeRange = urlParams.get('time_range');
-    if (timeRange) {
-        const timeRangeText = document.querySelector(`select[name="time_range"] option[value="${timeRange}"]`).text;
-        statusText.push(`时间范围: ${timeRangeText}`);
-    }
-
-    // 检查自定义日期范围
-    const startDate = urlParams.get('start_date');
-    const endDate = urlParams.get('end_date');
-    if (startDate || endDate) {
-        let dateRangeText = '日期范围: ';
-        if (startDate) dateRangeText += startDate;
-        dateRangeText += ' 至 ';
-        if (endDate) dateRangeText += endDate;
-        statusText.push(dateRangeText);
-    }
-
-    // 显示或隐藏筛选状态
     if (statusText.length > 0) {
         filterStatusText.textContent = statusText.join(' | ');
         filterStatus.style.display = 'block';
@@ -383,32 +307,12 @@ function updateFilterStatus() {
     }
 }
 
-// 清除所有筛选
+// 清除筛选
 function clearFilters() {
-    window.location.href = window.location.pathname;
+    window.location.search = '';
 }
 
-// 页面加载时设置当前筛选状态
-document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    // 设置表单值
-    for (let [key, value] of urlParams.entries()) {
-        const element = document.querySelector(`[name="${key}"]`);
-        if (element) {
-            element.value = value;
-        }
-    }
-    
-    // 根据时间范围设置日期输入状态
-    const timeRange = urlParams.get('time_range');
-    const dateInputs = document.querySelectorAll('input[type="date"]');
-    dateInputs.forEach(input => {
-        input.disabled = timeRange !== null && timeRange !== '';
-    });
-
-    // 更新筛选状态显示
-    updateFilterStatus();
-});
+// 页面加载时更新筛选状态
+document.addEventListener('DOMContentLoaded', updateFilterStatus);
 </script>
 {% endblock %} 

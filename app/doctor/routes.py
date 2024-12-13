@@ -1,73 +1,86 @@
 from flask import render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
-from sqlalchemy import func
 from datetime import datetime
 from app.models import db, User, HealthRecord, FollowUp
 from . import doctor_bp
 
-@doctor_bp.route('/home')
+@doctor_bp.route('/doctor/home')
 @login_required
 def home():
     """医生工作台首页"""
     if current_user.role != 'DOCTOR':
         flash('无权访问此页面', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
-    # 获取今日就诊数
-    today_date = datetime.now().date()
-    today_visits = HealthRecord.query.filter(
-        HealthRecord.doctor_id == current_user.id,
-        func.date(HealthRecord.record_date) == today_date
-    ).count()
+    # 获取统计数据
+    today = datetime.now().date()
+    pending_patients = 0  # 待处理患者数
+    today_records = HealthRecord.query.filter(
+        db.func.date(HealthRecord.record_date) == today
+    ).count()  # 今日新增记录数
+    abnormal_records = 0  # 异常指标数
     
-    # 获取待复诊数量
-    follow_up_count = FollowUp.query.filter_by(
-        doctor_id=current_user.id,
-        status='pending'
-    ).count()
+    # 获取最近活动
+    recent_activities = []
     
-    # 获取本月新增患者数
-    current_month = datetime.now()
-    new_patients_month = User.query.filter(
-        User.role == 'PATIENT',
-        func.extract('month', User.created_at) == current_month.month,
-        func.extract('year', User.created_at) == current_month.year
-    ).count()
-    
-    # 获取总患者数和我的患者数
-    total_patients = User.query.filter_by(role='PATIENT').count()
-    my_patients = User.query.filter_by(role='PATIENT')\
-        .join(HealthRecord, User.id == HealthRecord.patient_id)\
-        .filter(HealthRecord.doctor_id == current_user.id)\
-        .distinct().count()
-    
-    # 获取最近就诊记录（包含患者信息）
-    recent_records = HealthRecord.query\
-        .join(User, HealthRecord.patient_id == User.id)\
-        .filter(HealthRecord.doctor_id == current_user.id)\
-        .order_by(HealthRecord.record_date.desc())\
-        .limit(10)\
-        .all()
-    
-    return render_template('doctor/home.html',
-                         today_visits=today_visits,
-                         follow_up_count=follow_up_count,
-                         new_patients_month=new_patients_month,
-                         total_patients=total_patients,
-                         my_patients=my_patients,
-                         recent_records=recent_records)
+    return render_template('doctor/doctor_home.html',
+                         pending_patients=pending_patients,
+                         today_records=today_records,
+                         abnormal_records=abnormal_records,
+                         recent_activities=recent_activities)
 
-@doctor_bp.route('/add_record', methods=['GET', 'POST'])
+@doctor_bp.route('/doctor/patient_list')
 @login_required
-def add_record():
-    """医生添加记录页面"""
+def patient_list():
+    """患者列表页面"""
     if current_user.role != 'DOCTOR':
         flash('无权访问此页面', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
+    
+    patients = User.query.filter_by(role='PATIENT').all()
+    return render_template('doctor/patient_list.html', patients=patients)
+
+@doctor_bp.route('/doctor/add_record', methods=['GET', 'POST'])
+@login_required
+def add_record():
+    """添加就诊记录"""
+    if current_user.role != 'DOCTOR':
+        flash('无权访问此页面', 'danger')
+        return redirect(url_for('main.index'))
     
     if request.method == 'POST':
-        # 处理添加记录的逻辑
-        pass
+        try:
+            # 获取表单数据
+            patient_id = request.form.get('patient_id')
+            record_type = request.form.get('record_type')
+            record_date = request.form.get('record_date')
+            
+            # 创建新记录
+            new_record = HealthRecord(
+                patient_id=patient_id,
+                doctor_id=current_user.id,
+                record_type=record_type,
+                record_date=datetime.strptime(record_date, '%Y-%m-%d'),
+                symptoms=request.form.get('symptoms'),
+                diagnosis=request.form.get('diagnosis'),
+                treatment=request.form.get('treatment'),
+                height=request.form.get('height', type=float),
+                weight=request.form.get('weight', type=float),
+                blood_pressure=f"{request.form.get('blood_pressure_sys', '')}/{request.form.get('blood_pressure_dia', '')}",
+                heart_rate=request.form.get('heart_rate', type=int),
+                blood_sugar=request.form.get('blood_sugar', type=float)
+            )
+            
+            db.session.add(new_record)
+            db.session.commit()
+            flash('就诊记录添加成功！', 'success')
+            return redirect(url_for('doctor.patient_list'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash('添加记录失败，请重试', 'danger')
+            print(f"Error adding record: {str(e)}")
+            return redirect(url_for('doctor.add_record'))
     
     return render_template('doctor/add_record.html')
 
@@ -77,7 +90,7 @@ def view_patient(patient_id):
     """查看患者详情页面"""
     if current_user.role != 'DOCTOR':
         flash('无权访问此页面', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     patient = User.query.get_or_404(patient_id)
     if patient.role != 'PATIENT':
@@ -103,7 +116,7 @@ def edit_record(record_id):
     """编辑健康记录"""
     if current_user.role != 'DOCTOR':
         flash('无权访问此页面', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     record = HealthRecord.query.get_or_404(record_id)
     
