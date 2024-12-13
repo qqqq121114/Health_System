@@ -37,8 +37,20 @@ def patient_list():
         flash('无权访问此页面', 'danger')
         return redirect(url_for('main.index'))
     
-    patients = User.query.filter_by(role='PATIENT').all()
-    return render_template('doctor/patient_list.html', patients=patients)
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    
+    # 获取患者列表并分页
+    pagination = User.query.filter_by(role='PATIENT').paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False
+    )
+    
+    return render_template('doctor/patient_list.html',
+                         patients=pagination.items,
+                         page=page,
+                         pages=pagination.pages)
 
 @doctor_bp.route('/doctor/add_record', methods=['GET', 'POST'])
 @login_required

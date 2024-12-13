@@ -1,167 +1,226 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <!-- 左侧导航栏 -->
-        <div class="col-md-3">
-            <div class="list-group">
-                <a href="#overview" class="list-group-item list-group-item-action active" data-bs-toggle="list">
-                    <i class="fas fa-chart-line"></i> 健康概览
-                </a>
-                <a href="#advice" class="list-group-item list-group-item-action" data-bs-toggle="list">
-                    <i class="fas fa-comment-medical"></i> 健康建议
-                </a>
-                <a href="#plan" class="list-group-item list-group-item-action" data-bs-toggle="list">
-                    <i class="fas fa-calendar-check"></i> 健康计划
-                </a>
-                <a href="#reminder" class="list-group-item list-group-item-action" data-bs-toggle="list">
-                    <i class="fas fa-bell"></i> 健康提醒
-                </a>
+<div class="container-fluid py-4">
+    <!-- 页面标题 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-user-md text-primary"></i> 个性化健康建议
+        </h2>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary" onclick="window.print()">
+                <i class="fas fa-print me-1"></i> 打印建议
+            </button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shareModal">
+                <i class="fas fa-share-alt me-1"></i> 分享给医生
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- 健康评分 -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-heartbeat text-primary"></i>
+                        </div>
+                        <div>
+                            <h6 class="card-subtitle text-muted mb-1">总体健康评分</h6>
+                            <h3 class="card-title mb-0">85<small class="text-muted">/100</small></h3>
+                        </div>
+                    </div>
+                    <div class="progress mb-3" style="height: 4px;">
+                        <div class="progress-bar bg-primary" style="width: 85%"></div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col">
+                            <small class="text-muted d-block">上周</small>
+                            <span class="text-success">
+                                <i class="fas fa-arrow-up"></i> 82
+                            </span>
+                        </div>
+                        <div class="col">
+                            <small class="text-muted d-block">本周</small>
+                            <strong>85</strong>
+                        </div>
+                        <div class="col">
+                            <small class="text-muted d-block">目标</small>
+                            <span>90</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- 右侧内容区 -->
-        <div class="col-md-9">
-            <div class="tab-content">
-                <!-- 健康概览 -->
-                <div class="tab-pane fade show active" id="overview">
-                    <h2 class="mb-4">健康概览</h2>
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">最近体征</h5>
-                                    <div class="table-responsive">
-                                        <table class="table table-borderless">
-                                            <tr>
-                                                <td>血压</td>
-                                                <td>120/80 mmHg</td>
-                                            </tr>
-                                            <tr>
-                                                <td>心率</td>
-                                                <td>75 次/分</td>
-                                            </tr>
-                                            <tr>
-                                                <td>血糖</td>
-                                                <td>5.6 mmol/L</td>
-                                            </tr>
-                                            <tr>
-                                                <td>体重</td>
-                                                <td>65 kg</td>
-                                            </tr>
-                                        </table>
-                                    </div>
+        <!-- 关键指标 -->
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line text-primary me-2"></i>关键健康指标
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-3">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                                    <i class="fas fa-heart text-success"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">血压</small>
+                                    <h6 class="mb-0">120/80</h6>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">健康趋势</h5>
-                                    <canvas id="healthTrend"></canvas>
+                        <div class="col-md-3">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                                    <i class="fas fa-tint text-info"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">血糖</small>
+                                    <h6 class="mb-0">5.6</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-warning bg-opacity-10 p-3 me-3">
+                                    <i class="fas fa-heartbeat text-warning"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">心率</small>
+                                    <h6 class="mb-0">75</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-danger bg-opacity-10 p-3 me-3">
+                                    <i class="fas fa-weight text-danger"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">体重</small>
+                                    <h6 class="mb-0">65kg</h6>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- 健康建议 -->
-                <div class="tab-pane fade" id="advice">
-                    <h2 class="mb-4">健康建议</h2>
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title">生活方式建议</h5>
-                            <ul class="list-unstyled">
-                                <li class="mb-3">
-                                    <i class="fas fa-check-circle text-success"></i>
-                                    保持规律作息，每天保证7-8小时睡眠
-                                </li>
-                                <li class="mb-3">
-                                    <i class="fas fa-check-circle text-success"></i>
-                                    适量运动，建议每天步行30分钟
-                                </li>
-                                <li class="mb-3">
-                                    <i class="fas fa-exclamation-circle text-warning"></i>
-                                    注意控制饮食，减少高盐高脂食物摄入
-                                </li>
-                                <li class="mb-3">
-                                    <i class="fas fa-check-circle text-success"></i>
-                                    保持心情愉悦，多参与社交活动
-                                </li>
-                            </ul>
-                        </div>
+        <!-- 个性化建议 -->
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>个性化建议
+                    </h5>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-secondary btn-sm active">今日</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm">本周</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm">本月</button>
                     </div>
                 </div>
-
-                <!-- 健康计划 -->
-                <div class="tab-pane fade" id="plan">
-                    <h2 class="mb-4">健康计划</h2>
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title">本周计划</h5>
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>时间</th>
-                                            <th>项目</th>
-                                            <th>状态</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>周一</td>
-                                            <td>晨练、血压监测</td>
-                                            <td><span class="badge bg-success">已完成</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>周二</td>
-                                            <td>游泳、血糖监测</td>
-                                            <td><span class="badge bg-warning">进行中</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>周三</td>
-                                            <td>太极拳、体重监测</td>
-                                            <td><span class="badge bg-secondary">待完成</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                <div class="card-body">
+                    <div class="advice-list">
+                        {% for advice in advice_list|default([], true) %}
+                        <div class="d-flex align-items-start mb-4">
+                            <div class="flex-shrink-0">
+                                <span class="badge rounded-pill bg-{{ advice.type }}-subtle text-{{ advice.type }} p-2">
+                                    <i class="fas fa-{{ advice.icon }} fa-lg"></i>
+                                </span>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 健康提醒 -->
-                <div class="tab-pane fade" id="reminder">
-                    <h2 class="mb-4">健康提醒</h2>
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title">待办事项</h5>
-                            <div class="list-group">
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">复诊提醒</h6>
-                                        <small class="text-muted">3天后</small>
-                                    </div>
-                                    <p class="mb-1">心血管科复诊</p>
-                                </div>
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">用药提醒</h6>
-                                        <small class="text-muted">每天</small>
-                                    </div>
-                                    <p class="mb-1">早晚各服用降压药1次</p>
-                                </div>
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">体检提醒</h6>
-                                        <small class="text-muted">2周后</small>
-                                    </div>
-                                    <p class="mb-1">年度体检</p>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">{{ advice.title }}</h6>
+                                <p class="text-muted mb-2">{{ advice.content }}</p>
+                                <div class="d-flex align-items-center">
+                                    <button class="btn btn-link btn-sm text-{{ advice.type }} p-0">
+                                        了解更多 <i class="fas fa-arrow-right ms-1"></i>
+                                    </button>
+                                    <span class="badge bg-{{ advice.type }}-subtle text-{{ advice.type }} ms-2">
+                                        {{ advice.tag }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-clipboard-check fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">暂无个性化建议</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧边栏 -->
+        <div class="col-md-4">
+            <!-- 今日任务 -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tasks text-primary me-2"></i>今日任务
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="task-list">
+                        {% for task in tasks|default([], true) %}
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="task{{ loop.index }}"
+                                   {{ 'checked' if task.completed }}>
+                            <label class="form-check-label" for="task{{ loop.index }}">
+                                <span class="d-block">{{ task.title }}</span>
+                                <small class="text-muted">{{ task.time }}</small>
+                            </label>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">今日暂无待办任务</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用药提醒 -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-pills text-danger me-2"></i>用药提醒
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="medicine-list">
+                        {% for medicine in medicines|default([], true) %}
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0">
+                                <span class="badge rounded-pill bg-{{ medicine.type }}-subtle p-2">
+                                    <i class="fas fa-{{ medicine.icon }}"></i>
+                                </span>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">{{ medicine.name }}</h6>
+                                <small class="text-muted">{{ medicine.time }}</small>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <button class="btn btn-sm btn-outline-{{ medicine.type }}">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-prescription-bottle fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">暂无用药提醒</p>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -169,74 +228,121 @@
     </div>
 </div>
 
+<!-- 分享模态框 -->
+<div class="modal fade" id="shareModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">
+                    <i class="fas fa-share-alt text-primary me-2"></i>分享健康报告
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group mb-3">
+                    <label class="form-label">选择医生</label>
+                    <select class="form-select">
+                        <option value="">请选择医生...</option>
+                        <option value="1">张医生 - 心内科</option>
+                        <option value="2">李医生 - 内分泌科</option>
+                    </select>
+                </div>
+                <div class="form-group mb-3">
+                    <label class="form-label">附加说明</label>
+                    <textarea class="form-control" rows="3" placeholder="输入需要说明的内容..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary">
+                    <i class="fas fa-paper-plane me-1"></i> 发送
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
-.list-group-item {
-    border: none;
-    padding: 1rem 1.25rem;
-    margin-bottom: 0.5rem;
-    border-radius: 0.5rem !important;
-}
-
-.list-group-item.active {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
-}
-
-.list-group-item i {
-    margin-right: 0.5rem;
-}
-
 .card {
-    border: none;
-    box-shadow: 0 2px 4px rgba(0,0,0,.05);
-    border-radius: 0.5rem;
+    transition: transform 0.2s ease;
 }
 
-.tab-content {
-    padding: 1rem;
+.card:hover {
+    transform: translateY(-2px);
 }
 
-h2 {
-    color: var(--bs-primary);
-    font-weight: 600;
-}
-
-.table td {
-    padding: 0.75rem;
-    vertical-align: middle;
+.progress {
+    border-radius: 2px;
 }
 
 .badge {
-    font-weight: normal;
-    padding: 0.5em 0.8em;
+    font-weight: 500;
+}
+
+.btn-group .btn {
+    border-radius: 0.5rem;
+    margin: 0 0.25rem;
+}
+
+.btn-group .btn:first-child {
+    margin-left: 0;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+.form-check-input:checked ~ .form-check-label {
+    text-decoration: line-through;
+    color: var(--bs-text-muted);
+}
+
+.task-list .form-check:last-child {
+    margin-bottom: 0;
+}
+
+.medicine-list .badge {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 </style>
 
 {% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// 健康趋势图表
-const ctx = document.getElementById('healthTrend').getContext('2d');
-new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
-        datasets: [{
-            label: '血压',
-            data: [120, 118, 122, 119, 121, 120, 118],
-            borderColor: 'rgb(75, 192, 192)',
-            tension: 0.1
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            y: {
-                beginAtZero: false
+document.addEventListener('DOMContentLoaded', function() {
+    // 任务完成状态处理
+    const checkboxes = document.querySelectorAll('.form-check-input');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const label = this.nextElementSibling;
+            if (this.checked) {
+                label.style.textDecoration = 'line-through';
+                label.style.color = 'var(--bs-text-muted)';
+            } else {
+                label.style.textDecoration = 'none';
+                label.style.color = 'var(--bs-body-color)';
             }
-        }
-    }
+        });
+    });
+
+    // 用药提醒处理
+    const medicineButtons = document.querySelectorAll('.medicine-list .btn');
+    medicineButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            if (icon.classList.contains('fa-check')) {
+                icon.classList.replace('fa-check', 'fa-undo');
+                this.classList.add('btn-outline-success');
+            } else {
+                icon.classList.replace('fa-undo', 'fa-check');
+                this.classList.remove('btn-outline-success');
+            }
+        });
+    });
 });
 </script>
+{% endblock %}
 {% endblock %} 

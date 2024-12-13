@@ -1,84 +1,321 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
-            <h2>健康分析</h2>
-            <hr>
+<div class="container-fluid py-4">
+    <!-- 页面标题 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-chart-bar text-primary"></i> 健康分析中心
+        </h2>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary" onclick="window.print()">
+                <i class="fas fa-print me-1"></i> 打印报告
+            </button>
+            <button type="button" class="btn btn-outline-secondary" id="shareBtn">
+                <i class="fas fa-share-alt me-1"></i> 分享给医生
+            </button>
         </div>
     </div>
 
-    <div class="row">
-        <!-- 健康趋势卡片 -->
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
+    <!-- 健康状况概览 -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="fas fa-chart-line text-primary"></i>
-                        健康趋势
-                    </h5>
-                    <p class="card-text">查看您的血压、血糖、心率和体重等健康指标的变化趋势。</p>
-                    <a href="{{ url_for('analysis.health_trends') }}" class="btn btn-primary">
-                        查看趋势
-                    </a>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-heartbeat text-primary"></i>
+                        </div>
+                        <div>
+                            <h6 class="card-subtitle text-muted mb-1">血压状态</h6>
+                            <h4 class="card-title mb-0 {{ 'text-success' if blood_pressure_status == 'normal' else 'text-danger' }}">
+                                {{ blood_pressure_status|default('暂无数据', true) }}
+                            </h4>
+                        </div>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-primary" style="width: {{ blood_pressure_percentage|default(0, true) }}%"></div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- 风险评估卡片 -->
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="fas fa-exclamation-triangle text-warning"></i>
-                        风险评估
-                    </h5>
-                    <p class="card-text">基于您的最新健康数据，评估潜在的健康风险并提供建议。</p>
-                    <a href="{{ url_for('analysis.risk_assessment') }}" class="btn btn-warning">
-                        查看评估
-                    </a>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-tint text-success"></i>
+                        </div>
+                        <div>
+                            <h6 class="card-subtitle text-muted mb-1">血糖水平</h6>
+                            <h4 class="card-title mb-0 {{ 'text-success' if blood_sugar_status == 'normal' else 'text-danger' }}">
+                                {{ blood_sugar_status|default('暂无数据', true) }}
+                            </h4>
+                        </div>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-success" style="width: {{ blood_sugar_percentage|default(0, true) }}%"></div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- 健康统计卡片 -->
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="fas fa-calculator text-success"></i>
-                        健康统计
-                    </h5>
-                    <p class="card-text">查看您的各项健康指标的统计数据，包括平均值、最高值和最低值。</p>
-                    <a href="{{ url_for('analysis.health_stats') }}" class="btn btn-success">
-                        查看统计
-                    </a>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-warning bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-weight text-warning"></i>
+                        </div>
+                        <div>
+                            <h6 class="card-subtitle text-muted mb-1">BMI 指数</h6>
+                            <h4 class="card-title mb-0 {{ 'text-success' if bmi_status == 'normal' else 'text-warning' }}">
+                                {{ bmi_status|default('暂无数据', true) }}
+                            </h4>
+                        </div>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-warning" style="width: {{ bmi_percentage|default(0, true) }}%"></div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- 健康提示 -->
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="fas fa-lightbulb text-info"></i>
-                        健康小贴士
-                    </h5>
-                    <div class="alert alert-info">
-                        <ul class="mb-0">
-                            <li>定期记录您的健康数据，有助于更好地了解您的健康状况</li>
-                            <li>关注健康趋势的变化，及时发现潜在的健康问题</li>
-                            <li>根据风险评估结果，采取相应的预防措施</li>
-                            <li>如有异常情况，请及时咨询医生</li>
-                        </ul>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-chart-line text-info"></i>
+                        </div>
+                        <div>
+                            <h6 class="card-subtitle text-muted mb-1">总体健康评分</h6>
+                            <h4 class="card-title mb-0">{{ health_score|default('--', true) }}/100</h4>
+                        </div>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-info" style="width: {{ health_score|default(0, true) }}%"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- 主要功能区 -->
+    <div class="row g-4 mb-4">
+        <!-- 健康趋势分析 -->
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line text-primary me-2"></i>健康趋势分析
+                    </h5>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-secondary btn-sm active">周</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm">月</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm">年</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="healthTrendChart" style="height: 300px;"></div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ url_for('analysis.health_trends') }}" class="btn btn-link text-primary">
+                        查看详细趋势 <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 健康风险评估 -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>健康风险评估
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="risk-items">
+                        {% for risk in health_risks|default([], true) %}
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0">
+                                <span class="badge rounded-pill bg-{{ risk.level }}-subtle text-{{ risk.level }} p-2">
+                                    <i class="fas fa-{{ risk.icon }}"></i>
+                                </span>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">{{ risk.name }}</h6>
+                                <small class="text-muted">{{ risk.description }}</small>
+                            </div>
+                            <div class="flex-shrink-0 ms-2">
+                                <span class="badge bg-{{ risk.level }}">{{ risk.score }}%</span>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-check-circle fa-3x mb-3"></i>
+                            <p class="mb-0">暂未发现明显健康风险</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ url_for('analysis.risk_assessment') }}" class="btn btn-link text-warning">
+                        查看详细评估 <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 健康建议和统计 -->
+    <div class="row g-4">
+        <!-- 健康建议 -->
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>个性化健康建议
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        {% for advice in health_advice|default([], true) %}
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <span class="badge rounded-pill bg-{{ advice.type }}-subtle text-{{ advice.type }} p-2">
+                                        <i class="fas fa-{{ advice.icon }}"></i>
+                                    </span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1">{{ advice.title }}</h6>
+                                    <p class="mb-0 small text-muted">{{ advice.content }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="col-12 text-center text-muted py-4">
+                            <i class="fas fa-user-md fa-3x mb-3"></i>
+                            <p class="mb-0">请先完善您的健康记录，以获取个性化建议</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 健康统计 -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calculator text-success me-2"></i>健康数据统计
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="stats-items">
+                        {% for stat in health_stats|default([], true) %}
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">{{ stat.name }}</h6>
+                                <small class="text-muted">{{ stat.period }}</small>
+                            </div>
+                            <div class="text-end">
+                                <h6 class="mb-0">{{ stat.value }}</h6>
+                                <small class="text-{{ stat.trend_color }}">
+                                    <i class="fas fa-{{ stat.trend_icon }}"></i>
+                                    {{ stat.trend_value }}
+                                </small>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-chart-pie fa-3x mb-3"></i>
+                            <p class="mb-0">暂无统计数据</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ url_for('analysis.health_stats') }}" class="btn btn-link text-success">
+                        查看详细统计 <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 初始化健康趋势图表
+    const chartDom = document.getElementById('healthTrendChart');
+    if (chartDom) {
+        const myChart = echarts.init(chartDom);
+        const option = {
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['血压', '血糖', '心率', '体重']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    name: '血压',
+                    type: 'line',
+                    smooth: true,
+                    data: [120, 132, 101, 134, 90, 230, 210]
+                },
+                {
+                    name: '血糖',
+                    type: 'line',
+                    smooth: true,
+                    data: [220, 182, 191, 234, 290, 330, 310]
+                },
+                {
+                    name: '心率',
+                    type: 'line',
+                    smooth: true,
+                    data: [150, 232, 201, 154, 190, 330, 410]
+                },
+                {
+                    name: '体重',
+                    type: 'line',
+                    smooth: true,
+                    data: [320, 332, 301, 334, 390, 330, 320]
+                }
+            ]
+        };
+        myChart.setOption(option);
+
+        // 响应窗口大小变化
+        window.addEventListener('resize', function() {
+            myChart.resize();
+        });
+    }
+
+    // 分享按钮事件处理
+    document.getElementById('shareBtn').addEventListener('click', function() {
+        // TODO: 实现分享功能
+        alert('分享功能即将上线，敬请期待！');
+    });
+});
+</script>
 {% endblock %} 

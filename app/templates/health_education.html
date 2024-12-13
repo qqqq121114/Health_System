@@ -1,23 +1,68 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <!-- 左侧导航栏 -->
+<div class="container-fluid py-4">
+    <!-- 页面标题 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-graduation-cap text-primary"></i> 健康教育中心
+        </h2>
+        <div class="d-flex gap-2">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="搜索健康知识..." id="searchInput">
+                <button class="btn btn-outline-primary" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- 左侧导航和快速访问 -->
         <div class="col-md-3">
-            <div class="list-group">
-                <a href="#nutrition" class="list-group-item list-group-item-action active" data-bs-toggle="list">
-                    <i class="fas fa-apple-alt"></i> 营养健康
-                </a>
-                <a href="#exercise" class="list-group-item list-group-item-action" data-bs-toggle="list">
-                    <i class="fas fa-running"></i> 运动锻炼
-                </a>
-                <a href="#disease" class="list-group-item list-group-item-action" data-bs-toggle="list">
-                    <i class="fas fa-heartbeat"></i> 疾病预防
-                </a>
-                <a href="#mental" class="list-group-item list-group-item-action" data-bs-toggle="list">
-                    <i class="fas fa-brain"></i> 心理健康
-                </a>
+            <!-- 分类导航 -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-0">
+                    <nav class="nav flex-column">
+                        <a class="nav-link active py-3 px-4" href="#nutrition" data-bs-toggle="pill">
+                            <i class="fas fa-apple-alt text-success me-2"></i>营养健康
+                            <span class="badge bg-primary rounded-pill float-end">12</span>
+                        </a>
+                        <a class="nav-link py-3 px-4" href="#exercise" data-bs-toggle="pill">
+                            <i class="fas fa-running text-info me-2"></i>运动锻炼
+                            <span class="badge bg-primary rounded-pill float-end">8</span>
+                        </a>
+                        <a class="nav-link py-3 px-4" href="#disease" data-bs-toggle="pill">
+                            <i class="fas fa-heartbeat text-danger me-2"></i>疾病预防
+                            <span class="badge bg-primary rounded-pill float-end">15</span>
+                        </a>
+                        <a class="nav-link py-3 px-4" href="#mental" data-bs-toggle="pill">
+                            <i class="fas fa-brain text-warning me-2"></i>心理健康
+                            <span class="badge bg-primary rounded-pill float-end">10</span>
+                        </a>
+                        <a class="nav-link py-3 px-4" href="#first-aid" data-bs-toggle="pill">
+                            <i class="fas fa-first-aid text-danger me-2"></i>急救知识
+                            <span class="badge bg-primary rounded-pill float-end">6</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- 健康小贴士 -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>每日健康贴士
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="tip-carousel">
+                        <div class="tip-item">
+                            <p class="mb-2">今日提示：</p>
+                            <p class="text-muted small mb-0">保持充足的睡眠对身体健康至关重要，建议每天保持7-8小时的优质睡眠。</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -26,68 +71,361 @@
             <div class="tab-content">
                 <!-- 营养健康 -->
                 <div class="tab-pane fade show active" id="nutrition">
-                    <h2 class="mb-4">营养健康</h2>
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title">均衡饮食的重要性</h5>
-                            <p class="card-text">合理的营养搭配对老年人的健康至关重要。建议：</p>
-                            <ul>
-                                <li>每天摄入充足的蛋白质，如瘦肉、鱼、蛋、豆制品等</li>
-                                <li>多吃新鲜蔬菜和水果，补充维生素和膳食纤维</li>
-                                <li>适量摄入全谷物，保证碳水化合物的供应</li>
-                                <li>控制盐分和油脂的摄入，预防心血管疾病</li>
-                            </ul>
+                    <div class="row g-4">
+                        <!-- 特色内容卡片 -->
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                                            <i class="fas fa-leaf text-success"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0">健康饮食指南</h5>
+                                    </div>
+                                    <p class="card-text">了解如何通过均衡饮食来维护健康，预防疾病。</p>
+                                    <a href="#" class="btn btn-outline-success btn-sm">
+                                        查看详情 <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                                            <i class="fas fa-utensils text-primary"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0">营养食谱推荐</h5>
+                                    </div>
+                                    <p class="card-text">为您精选适合的健康食谱，轻松做出营养美味的膳食。</p>
+                                    <a href="#" class="btn btn-outline-primary btn-sm">
+                                        查看详情 <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 营养知识列表 -->
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">最新营养知识</h5>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm active">全部</button>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm">饮食指南</button>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm">营养素</button>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm">食品安全</button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group list-group-flush">
+                                        {% for article in nutrition_articles|default([], true) %}
+                                        <div class="list-group-item px-0">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h6 class="mb-1">{{ article.title }}</h6>
+                                                    <p class="text-muted small mb-0">{{ article.description }}</p>
+                                                </div>
+                                                <div class="text-end">
+                                                    <small class="text-muted d-block">{{ article.date }}</small>
+                                                    <span class="badge bg-success">{{ article.category }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% else %}
+                                        <div class="text-center py-4">
+                                            <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                                            <p class="text-muted">暂无相关文章</p>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent border-0 text-center">
+                                    <button type="button" class="btn btn-link text-primary">
+                                        加载更多 <i class="fas fa-chevron-down ms-1"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- 运动锻炼 -->
                 <div class="tab-pane fade" id="exercise">
-                    <h2 class="mb-4">运动锻炼</h2>
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title">适合老年人的运动方式</h5>
-                            <p class="card-text">规律运动可以增强体质，预防疾病。推荐以下运动：</p>
-                            <ul>
-                                <li>散步：每天30-60分钟，可分次进行</li>
-                                <li>太极拳：改善平衡能力，增强肌力</li>
-                                <li>游泳：减轻关节负担的有氧运动</li>
-                                <li>广场舞：增进社交，提高心肺功能</li>
-                            </ul>
+                    <div class="row g-4">
+                        <!-- 运动视频 -->
+                        <div class="col-md-8">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-transparent border-0">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-play-circle text-info me-2"></i>推荐运动视频
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="ratio ratio-16x9 mb-3">
+                                        <img src="https://via.placeholder.com/800x450" class="rounded" alt="运动视频封面">
+                                    </div>
+                                    <h5>居家健身指南</h5>
+                                    <p class="text-muted">适合老年人的居家运动方案，安全有效。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 运动计划 -->
+                        <div class="col-md-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-transparent border-0">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-calendar-alt text-primary me-2"></i>每周运动计划
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group list-group-flush">
+                                        <div class="list-group-item px-0">
+                                            <div class="d-flex justify-content-between">
+                                                <span>周一</span>
+                                                <span class="text-primary">散步 30分钟</span>
+                                            </div>
+                                        </div>
+                                        <div class="list-group-item px-0">
+                                            <div class="d-flex justify-content-between">
+                                                <span>周三</span>
+                                                <span class="text-success">太极拳 20分钟</span>
+                                            </div>
+                                        </div>
+                                        <div class="list-group-item px-0">
+                                            <div class="d-flex justify-content-between">
+                                                <span>周五</span>
+                                                <span class="text-info">广场舞 40分钟</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- 疾病预防 -->
                 <div class="tab-pane fade" id="disease">
-                    <h2 class="mb-4">疾病预防</h2>
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title">常见疾病的预防措施</h5>
-                            <p class="card-text">预防胜于治疗，注意以下几点：</p>
-                            <ul>
-                                <li>定期体检，早发现早治疗</li>
-                                <li>保持良好的生活习惯，规律作息</li>
-                                <li>注意保暖，预防感冒等疾病</li>
-                                <li>保持居住环境清洁，预防传染病</li>
-                            </ul>
+                    <div class="row g-4">
+                        <!-- 季节性提醒 -->
+                        <div class="col-12">
+                            <div class="alert alert-warning d-flex align-items-center" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <div>
+                                    季节性提醒：近期天气变化大，请注意保暖，预防感冒。
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 疾病预防知识 -->
+                        <div class="col-md-8">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-transparent border-0">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-shield-alt text-success me-2"></i>预防知识
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="accordion" id="preventionAccordion">
+                                        <div class="accordion-item border-0 mb-3">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#prevention1">
+                                                    高血压预防
+                                                </button>
+                                            </h2>
+                                            <div id="prevention1" class="accordion-collapse collapse show" data-bs-parent="#preventionAccordion">
+                                                <div class="accordion-body">
+                                                    <p>控制盐分摄入，保持运动习惯，定期监测血压...</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="accordion-item border-0 mb-3">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#prevention2">
+                                                    糖尿病预防
+                                                </button>
+                                            </h2>
+                                            <div id="prevention2" class="accordion-collapse collapse" data-bs-parent="#preventionAccordion">
+                                                <div class="accordion-body">
+                                                    <p>控制饮食，规律运动，保持健康的生活方式...</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 健康检查提醒 -->
+                        <div class="col-md-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-transparent border-0">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-calendar-check text-primary me-2"></i>体检提醒
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-user-md fa-3x text-primary mb-3"></i>
+                                        <h6>距离下次体检还有</h6>
+                                        <h2 class="text-primary">30天</h2>
+                                        <button class="btn btn-primary btn-sm mt-3">
+                                            预约体检
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- 心理健康 -->
                 <div class="tab-pane fade" id="mental">
-                    <h2 class="mb-4">心理健康</h2>
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title">保持积极乐观的心态</h5>
-                            <p class="card-text">心理健康对老年人的生活质量很重要：</p>
-                            <ul>
-                                <li>保持社交活动，避免孤独</li>
-                                <li>培养兴趣爱好，丰富生活</li>
-                                <li>与家人保持良好沟通</li>
-                                <li>适当参与社区活动</li>
-                            </ul>
+                    <div class="row g-4">
+                        <!-- 心情日记 -->
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-transparent border-0">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-book text-warning me-2"></i>心情日记
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="mb-3">
+                                            <label class="form-label">今天的心情如何？</label>
+                                            <div class="btn-group w-100">
+                                                <button type="button" class="btn btn-outline-primary">
+                                                    <i class="fas fa-smile"></i> 开心
+                                                </button>
+                                                <button type="button" class="btn btn-outline-warning">
+                                                    <i class="fas fa-meh"></i> 一般
+                                                </button>
+                                                <button type="button" class="btn btn-outline-danger">
+                                                    <i class="fas fa-frown"></i> 不好
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">记录一下今天的感受：</label>
+                                            <textarea class="form-control" rows="3" placeholder="写下您的想法..."></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">
+                                            保存记录
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 心理咨询 -->
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-transparent border-0">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-comments text-info me-2"></i>在线咨询
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-headset fa-3x text-info mb-3"></i>
+                                        <h6>专业心理咨询师在线</h6>
+                                        <p class="text-muted small mb-3">工作时间：周一至周五 9:00-18:00</p>
+                                        <button class="btn btn-info">
+                                            开始咨询
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 急救知识 -->
+                <div class="tab-pane fade" id="first-aid">
+                    <div class="row g-4">
+                        <!-- 急救指南 -->
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-transparent border-0">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-ambulance text-danger me-2"></i>急救指南
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-4">
+                                        <div class="col-md-4">
+                                            <div class="d-flex">
+                                                <div class="flex-shrink-0">
+                                                    <span class="badge rounded-pill bg-danger p-2">
+                                                        <i class="fas fa-heart fa-lg"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <h6>心脏骤停急救</h6>
+                                                    <p class="small text-muted mb-0">学习心肺复苏的基本步骤</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="d-flex">
+                                                <div class="flex-shrink-0">
+                                                    <span class="badge rounded-pill bg-warning p-2">
+                                                        <i class="fas fa-burn fa-lg"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <h6>烫伤处理</h6>
+                                                    <p class="small text-muted mb-0">正确的烫伤急救方法</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="d-flex">
+                                                <div class="flex-shrink-0">
+                                                    <span class="badge rounded-pill bg-info p-2">
+                                                        <i class="fas fa-bone fa-lg"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <h6>骨折急救</h6>
+                                                    <p class="small text-muted mb-0">骨折的临时固定方法</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 急救视频 -->
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-transparent border-0">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-video text-primary me-2"></i>急救教学视频
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-4">
+                                        <div class="col-md-4">
+                                            <div class="card">
+                                                <div class="ratio ratio-16x9">
+                                                    <img src="https://via.placeholder.com/300x169" class="card-img-top" alt="视频封面">
+                                                </div>
+                                                <div class="card-body">
+                                                    <h6 class="card-title">心肺复苏教学</h6>
+                                                    <p class="card-text small text-muted">10分钟掌握CPR基本技能</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -97,35 +435,75 @@
 </div>
 
 <style>
-.list-group-item {
-    border: none;
-    padding: 1rem 1.25rem;
-    margin-bottom: 0.5rem;
-    border-radius: 0.5rem !important;
+.nav-link {
+    color: var(--bs-body-color);
+    transition: all 0.3s ease;
 }
 
-.list-group-item.active {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
+.nav-link:hover {
+    background-color: var(--bs-light);
 }
 
-.list-group-item i {
-    margin-right: 0.5rem;
+.nav-link.active {
+    color: var(--bs-primary);
+    background-color: var(--bs-primary-bg-subtle);
+    font-weight: 500;
 }
 
 .card {
-    border: none;
-    box-shadow: 0 2px 4px rgba(0,0,0,.05);
-    border-radius: 0.5rem;
+    transition: transform 0.2s ease;
 }
 
-.tab-content {
-    padding: 1rem;
+.card:hover {
+    transform: translateY(-2px);
 }
 
-h2 {
+.accordion-button:not(.collapsed) {
+    background-color: var(--bs-primary-bg-subtle);
     color: var(--bs-primary);
-    font-weight: 600;
+}
+
+.accordion-button:focus {
+    box-shadow: none;
+}
+
+.badge {
+    font-weight: 500;
+}
+
+.btn-group .btn {
+    border-radius: 0.5rem;
+    margin: 0 0.25rem;
+}
+
+.btn-group .btn:first-child {
+    margin-left: 0;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
 }
 </style>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 搜索功能
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', function(e) {
+        // TODO: 实现搜索功能
+        console.log('搜索:', e.target.value);
+    });
+
+    // 标签切换
+    const pills = document.querySelectorAll('[data-bs-toggle="pill"]');
+    pills.forEach(pill => {
+        pill.addEventListener('shown.bs.tab', function(e) {
+            // TODO: 加载对应分类的内容
+            console.log('切换到:', e.target.getAttribute('href'));
+        });
+    });
+});
+</script>
+{% endblock %}
 {% endblock %} 

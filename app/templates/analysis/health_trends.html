@@ -1,271 +1,369 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
-            <h2>健康趋势分析</h2>
-            <hr>
+<div class="container-fluid py-4">
+    <!-- 页面标题 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-chart-line text-primary"></i> 健康趋势分析
+        </h2>
+        <div class="d-flex gap-2">
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary active" data-period="7">最近一周</button>
+                <button type="button" class="btn btn-outline-secondary" data-period="30">最近一月</button>
+                <button type="button" class="btn btn-outline-secondary" data-period="90">最近三月</button>
+            </div>
+            <button type="button" class="btn btn-outline-primary" onclick="window.print()">
+                <i class="fas fa-print me-1"></i> 打印报告
+            </button>
         </div>
     </div>
 
-    {% if not dates %}
-    <div class="row">
-        <div class="col-md-12">
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle"></i> 暂无健康记录数据，请先添加健康记录。
+    <!-- 图表区域 -->
+    <div class="row g-4">
+        <!-- 血压趋势 -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-heart text-danger me-2"></i>血压趋势
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="bloodPressureChart" style="height: 300px;"></div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        正常范围：收缩压90-140mmHg，舒张压60-90mmHg
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 血糖趋势 -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tint text-primary me-2"></i>血糖趋势
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="bloodSugarChart" style="height: 300px;"></div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        空腹正常范围：3.9-6.1mmol/L
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 心率趋势 -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-heartbeat text-warning me-2"></i>心率趋势
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="heartRateChart" style="height: 300px;"></div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        正常范围：60-100次/分
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 体重趋势 -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-weight text-success me-2"></i>体重趋势
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="weightChart" style="height: 300px;"></div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        建议保持稳定的体重，避免剧烈波动
+                    </small>
+                </div>
             </div>
         </div>
     </div>
-    {% else %}
-    <div class="row">
-        <!-- 血压趋势图 -->
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">血压趋势</h5>
-                    <canvas id="bloodPressureChart"></canvas>
-                </div>
-            </div>
-        </div>
 
-        <!-- 血糖趋势图 -->
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">血糖趋势</h5>
-                    <canvas id="bloodSugarChart"></canvas>
+    <!-- 趋势分析报告 -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-medical-alt text-info me-2"></i>趋势分析报告
+                    </h5>
                 </div>
-            </div>
-        </div>
-
-        <!-- 心率趋势图 -->
-        <div class="col-md-6 mb-4">
-            <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">心率趋势</h5>
-                    <canvas id="heartRateChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- 体重趋势图 -->
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">体重趋势</h5>
-                    <canvas id="weightChart"></canvas>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="mb-3">数据统计</h6>
+                            <table class="table table-sm">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>指标</th>
+                                        <th>最小值</th>
+                                        <th>最大值</th>
+                                        <th>平均值</th>
+                                        <th>变化趋势</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>收缩压</td>
+                                        <td>{{ stats.bp_sys_min if stats else '--' }}</td>
+                                        <td>{{ stats.bp_sys_max if stats else '--' }}</td>
+                                        <td>{{ stats.bp_sys_avg if stats else '--' }}</td>
+                                        <td>
+                                            <span class="text-{{ stats.bp_trend_color if stats else 'muted' }}">
+                                                <i class="fas fa-{{ stats.bp_trend_icon if stats else 'minus' }}"></i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>血糖</td>
+                                        <td>{{ stats.sugar_min if stats else '--' }}</td>
+                                        <td>{{ stats.sugar_max if stats else '--' }}</td>
+                                        <td>{{ stats.sugar_avg if stats else '--' }}</td>
+                                        <td>
+                                            <span class="text-{{ stats.sugar_trend_color if stats else 'muted' }}">
+                                                <i class="fas fa-{{ stats.sugar_trend_icon if stats else 'minus' }}"></i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mb-3">趋势分析</h6>
+                            <ul class="list-unstyled">
+                                {% for analysis in trend_analysis|default([], true) %}
+                                <li class="mb-2">
+                                    <i class="fas fa-{{ analysis.icon }} text-{{ analysis.color }} me-2"></i>
+                                    {{ analysis.text }}
+                                </li>
+                                {% else %}
+                                <li class="text-muted">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    暂无足够的数据进行趋势分析
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    {% endif %}
 </div>
 {% endblock %}
 
 {% block scripts %}
-<!-- Chart.js -->
-<script src="https://cdn.bootcdn.net/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 <script>
-// 日期数据
-const dates = {{ dates|tojson }};
-
-// 血压趋势图
-const bloodPressureData = {{ blood_pressure|tojson }};
-const systolicData = [];
-const diastolicData = [];
-
-bloodPressureData.forEach(bp => {
-    if (bp) {
-        const [sys, dia] = bp.split('/').map(Number);
-        systolicData.push(sys);
-        diastolicData.push(dia);
-    } else {
-        systolicData.push(null);
-        diastolicData.push(null);
-    }
-});
-
-new Chart(document.getElementById('bloodPressureChart'), {
-    type: 'line',
-    data: {
-        labels: dates,
-        datasets: [{
-            label: '收缩压',
-            data: systolicData,
-            borderColor: 'rgb(255, 99, 132)',
-            backgroundColor: 'rgba(255, 99, 132, 0.1)',
-            tension: 0.1,
-            fill: true
-        }, {
-            label: '舒张压',
-            data: diastolicData,
-            borderColor: 'rgb(54, 162, 235)',
-            backgroundColor: 'rgba(54, 162, 235, 0.1)',
-            tension: 0.1,
-            fill: true
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            title: {
-                display: true,
-                text: '血压变化趋势 (mmHg)'
-            },
-            tooltip: {
-                mode: 'index',
-                intersect: false
+document.addEventListener('DOMContentLoaded', function() {
+    const trend_data = {{ trend_data|tojson }};
+    
+    // 初始化血压趋势图
+    const bpChart = echarts.init(document.getElementById('bloodPressureChart'));
+    bpChart.setOption({
+        tooltip: {
+            trigger: 'axis',
+            formatter: function(params) {
+                let result = params[0].axisValue + '<br/>';
+                params.forEach(param => {
+                    result += param.marker + param.seriesName + ': ' + param.value + 'mmHg<br/>';
+                });
+                return result;
             }
         },
-        scales: {
-            y: {
-                beginAtZero: false,
-                title: {
-                    display: true,
-                    text: 'mmHg'
+        legend: {
+            data: ['收缩压', '舒张压']
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: trend_data.dates
+        },
+        yAxis: {
+            type: 'value',
+            name: 'mmHg'
+        },
+        series: [
+            {
+                name: '收缩压',
+                type: 'line',
+                smooth: true,
+                data: trend_data.blood_pressure_sys,
+                markArea: {
+                    data: [[
+                        { yAxis: 90 },
+                        { yAxis: 140 }
+                    ]]
                 }
             },
-            x: {
-                title: {
-                    display: true,
-                    text: '日期'
+            {
+                name: '舒张压',
+                type: 'line',
+                smooth: true,
+                data: trend_data.blood_pressure_dia,
+                markArea: {
+                    data: [[
+                        { yAxis: 60 },
+                        { yAxis: 90 }
+                    ]]
                 }
             }
-        }
-    }
-});
+        ]
+    });
 
-// 血糖趋势图
-new Chart(document.getElementById('bloodSugarChart'), {
-    type: 'line',
-    data: {
-        labels: dates,
-        datasets: [{
-            label: '血糖',
-            data: {{ blood_sugar|tojson }},
-            borderColor: 'rgb(75, 192, 192)',
-            backgroundColor: 'rgba(75, 192, 192, 0.1)',
-            tension: 0.1,
-            fill: true
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            title: {
-                display: true,
-                text: '血糖变化趋势 (mmol/L)'
-            },
-            tooltip: {
-                mode: 'index',
-                intersect: false
+    // 初始化血糖趋势图
+    const sugarChart = echarts.init(document.getElementById('bloodSugarChart'));
+    sugarChart.setOption({
+        tooltip: {
+            trigger: 'axis',
+            formatter: function(params) {
+                return params[0].axisValue + '<br/>' +
+                    params[0].marker + params[0].seriesName + ': ' + params[0].value + 'mmol/L';
             }
         },
-        scales: {
-            y: {
-                beginAtZero: false,
-                title: {
-                    display: true,
-                    text: 'mmol/L'
-                }
-            },
-            x: {
-                title: {
-                    display: true,
-                    text: '日期'
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: trend_data.dates
+        },
+        yAxis: {
+            type: 'value',
+            name: 'mmol/L'
+        },
+        series: [
+            {
+                name: '血糖',
+                type: 'line',
+                smooth: true,
+                data: trend_data.blood_sugar,
+                markArea: {
+                    data: [[
+                        { yAxis: 3.9 },
+                        { yAxis: 6.1 }
+                    ]]
                 }
             }
-        }
-    }
-});
+        ]
+    });
 
-// 心率趋势图
-new Chart(document.getElementById('heartRateChart'), {
-    type: 'line',
-    data: {
-        labels: dates,
-        datasets: [{
-            label: '心率',
-            data: {{ heart_rate|tojson }},
-            borderColor: 'rgb(153, 102, 255)',
-            backgroundColor: 'rgba(153, 102, 255, 0.1)',
-            tension: 0.1,
-            fill: true
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            title: {
-                display: true,
-                text: '心率变化趋势 (次/分)'
-            },
-            tooltip: {
-                mode: 'index',
-                intersect: false
+    // 初始化心率趋势图
+    const heartChart = echarts.init(document.getElementById('heartRateChart'));
+    heartChart.setOption({
+        tooltip: {
+            trigger: 'axis',
+            formatter: function(params) {
+                return params[0].axisValue + '<br/>' +
+                    params[0].marker + params[0].seriesName + ': ' + params[0].value + '次/分';
             }
         },
-        scales: {
-            y: {
-                beginAtZero: false,
-                title: {
-                    display: true,
-                    text: '次/分'
-                }
-            },
-            x: {
-                title: {
-                    display: true,
-                    text: '日期'
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: trend_data.dates
+        },
+        yAxis: {
+            type: 'value',
+            name: '次/分'
+        },
+        series: [
+            {
+                name: '心率',
+                type: 'line',
+                smooth: true,
+                data: trend_data.heart_rate,
+                markArea: {
+                    data: [[
+                        { yAxis: 60 },
+                        { yAxis: 100 }
+                    ]]
                 }
             }
-        }
-    }
-});
+        ]
+    });
 
-// 体重趋势图
-new Chart(document.getElementById('weightChart'), {
-    type: 'line',
-    data: {
-        labels: dates,
-        datasets: [{
-            label: '体重',
-            data: {{ weight|tojson }},
-            borderColor: 'rgb(255, 159, 64)',
-            backgroundColor: 'rgba(255, 159, 64, 0.1)',
-            tension: 0.1,
-            fill: true
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            title: {
-                display: true,
-                text: '体重变化趋势 (kg)'
-            },
-            tooltip: {
-                mode: 'index',
-                intersect: false
+    // 初始化体重趋势图
+    const weightChart = echarts.init(document.getElementById('weightChart'));
+    weightChart.setOption({
+        tooltip: {
+            trigger: 'axis',
+            formatter: function(params) {
+                return params[0].axisValue + '<br/>' +
+                    params[0].marker + params[0].seriesName + ': ' + params[0].value + 'kg';
             }
         },
-        scales: {
-            y: {
-                beginAtZero: false,
-                title: {
-                    display: true,
-                    text: 'kg'
-                }
-            },
-            x: {
-                title: {
-                    display: true,
-                    text: '日期'
-                }
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: trend_data.dates
+        },
+        yAxis: {
+            type: 'value',
+            name: 'kg'
+        },
+        series: [
+            {
+                name: '体重',
+                type: 'line',
+                smooth: true,
+                data: trend_data.weight
             }
-        }
-    }
+        ]
+    });
+
+    // 响应窗口大小变化
+    window.addEventListener('resize', function() {
+        bpChart.resize();
+        sugarChart.resize();
+        heartChart.resize();
+        weightChart.resize();
+    });
 });
 </script>
 {% endblock %} 

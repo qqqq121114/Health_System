@@ -1,135 +1,185 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <!-- 左侧导航栏 -->
-        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-            <div class="position-sticky">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('patient.health_records') }}">
-                            <i class="fas fa-notes-medical"></i> 健康档案
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addRecordModal">
-                            <i class="fas fa-plus-circle"></i> 添加记录
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+<div class="container-fluid py-4">
+    <!-- 页面标题和操作按钮 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-heartbeat text-primary"></i> 我的健康档案
+        </h2>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRecordModal">
+                <i class="fas fa-plus-circle me-1"></i> 添加记录
+            </button>
+            <button type="button" class="btn btn-outline-secondary" id="exportBtn">
+                <i class="fas fa-file-export me-1"></i> 导出数据
+            </button>
+        </div>
+    </div>
 
-        <!-- 主要内容区域 -->
-        <main class="col-md-10 ms-sm-auto px-md-4">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">我的健康档案</h1>
-                <div class="btn-toolbar mb-2 mb-md-0">
-                    <div class="btn-group me-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="filterBtn">
-                            <i class="fas fa-filter"></i> 筛选
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="exportBtn">
-                            <i class="fas fa-download"></i> 导出
-                        </button>
+    <!-- 健康数据概览卡片 -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-heart text-primary"></i>
+                        </div>
+                        <h6 class="card-title mb-0">血压</h6>
                     </div>
-                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addRecordModal">
-                        <i class="fas fa-plus"></i> 添加记录
+                    <h3 class="mb-1">{{ latest_record.blood_pressure if latest_record else '暂无数据' }}</h3>
+                    <p class="text-muted small mb-0">mmHg</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-tint text-success"></i>
+                        </div>
+                        <h6 class="card-title mb-0">血糖</h6>
+                    </div>
+                    <h3 class="mb-1">{{ latest_record.blood_sugar if latest_record else '暂无数据' }}</h3>
+                    <p class="text-muted small mb-0">mmol/L</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-warning bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-heartbeat text-warning"></i>
+                        </div>
+                        <h6 class="card-title mb-0">心率</h6>
+                    </div>
+                    <h3 class="mb-1">{{ latest_record.heart_rate if latest_record else '暂无数据' }}</h3>
+                    <p class="text-muted small mb-0">次/分</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-weight text-info"></i>
+                        </div>
+                        <h6 class="card-title mb-0">体重</h6>
+                    </div>
+                    <h3 class="mb-1">{{ latest_record.weight if latest_record else '暂无数据' }}</h3>
+                    <p class="text-muted small mb-0">kg</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 筛选器 -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form id="filterForm" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">记录类型</label>
+                    <select class="form-select" name="record_type">
+                        <option value="">全部类型</option>
+                        <option value="DAILY_MONITOR">日常监测</option>
+                        <option value="PHYSICAL_EXAM">体检报告</option>
+                        <option value="MEDICAL_HISTORY">病史记录</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">时间范围</label>
+                    <select class="form-select" name="time_range" id="timeRange">
+                        <option value="">全部时间</option>
+                        <option value="today">今天</option>
+                        <option value="week">最近一周</option>
+                        <option value="month">最近一月</option>
+                        <option value="custom">自定义时间</option>
+                    </select>
+                </div>
+                <div class="col-md-4" id="customDateRange" style="display: none;">
+                    <label class="form-label">自定义日期</label>
+                    <div class="input-group">
+                        <input type="date" class="form-control" name="start_date">
+                        <span class="input-group-text">至</span>
+                        <input type="date" class="form-control" name="end_date">
+                    </div>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter me-1"></i> 筛选
                     </button>
                 </div>
-            </div>
+            </form>
+        </div>
+    </div>
 
-            <!-- 筛选面板 -->
-            <div class="collapse mb-3" id="filterPanel">
-                <div class="card">
-                    <div class="card-body">
-                        <form id="filterForm" method="POST">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <label class="form-label">记录类型</label>
-                                    <select class="form-select" name="record_type">
-                                        <option value="">全部</option>
-                                        <option value="MEDICAL_HISTORY">病史记录</option>
-                                        <option value="PHYSICAL_EXAM">体检报告</option>
-                                        <option value="DAILY_MONITOR">日常监测</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">时间范围</label>
-                                    <select class="form-select" name="time_range">
-                                        <option value="">全部</option>
-                                        <option value="today">今天</option>
-                                        <option value="week">最近一周</option>
-                                        <option value="month">最近一月</option>
-                                        <option value="year">最近一年</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">日期范围</label>
-                                    <div class="input-group">
-                                        <input type="date" class="form-control" name="start_date">
-                                        <span class="input-group-text">至</span>
-                                        <input type="date" class="form-control" name="end_date">
-                                    </div>
-                                </div>
-                                <div class="col-md-2 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-primary w-100">应用筛选</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 筛选状态提示 -->
-            <div id="filterStatus" class="alert alert-info mb-3" style="display: none;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>当前筛选：</strong>
-                        <span id="filterStatusText"></span>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearFilters()">
-                        <i class="fas fa-times"></i> 清除筛选
-                    </button>
-                </div>
-            </div>
-
-            <!-- 健康记录列表 -->
+    <!-- 记录列表 -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
                         <tr>
-                            <th>记录日期</th>
-                            <th>记录类型</th>
-                            <th>主要症状</th>
-                            <th>医生诊断</th>
-                            <th>操作</th>
+                            <th class="border-0">记录日期</th>
+                            <th class="border-0">记录类型</th>
+                            <th class="border-0">血压 (mmHg)</th>
+                            <th class="border-0">血糖 (mmol/L)</th>
+                            <th class="border-0">心率 (次/分)</th>
+                            <th class="border-0">体重 (kg)</th>
+                            <th class="border-0">操作</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for record in records %}
                         <tr>
                             <td>{{ record.record_date.strftime('%Y-%m-%d') }}</td>
-                            <td>{{ record.record_type }}</td>
-                            <td>{{ record.symptoms[:30] + '...' if record.symptoms and record.symptoms|length > 30 else record.symptoms }}</td>
-                            <td>{{ record.diagnosis[:30] + '...' if record.diagnosis and record.diagnosis|length > 30 else record.diagnosis }}</td>
                             <td>
-                                <a href="{{ url_for('patient.view_record', record_id=record.id) }}" class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-eye"></i> 查看
-                                </a>
-                                {% if not record.doctor_id %}
-                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteRecord({{ record.id }})">
-                                    <i class="fas fa-trash"></i> 删除
-                                </button>
+                                {% if record.record_type == 'DAILY_MONITOR' %}
+                                    <span class="badge bg-primary rounded-pill">日常监测</span>
+                                {% elif record.record_type == 'PHYSICAL_EXAM' %}
+                                    <span class="badge bg-success rounded-pill">体检报告</span>
+                                {% else %}
+                                    <span class="badge bg-warning rounded-pill">病史记录</span>
                                 {% endif %}
+                            </td>
+                            <td>{{ record.blood_pressure or '-' }}</td>
+                            <td>{{ record.blood_sugar or '-' }}</td>
+                            <td>{{ record.heart_rate or '-' }}</td>
+                            <td>{{ record.weight or '-' }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('patient.view_record', record_id=record.id) }}" 
+                                       class="btn btn-sm btn-outline-primary" title="查看详情">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if not record.doctor_id %}
+                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            onclick="deleteRecord({{ record.id }})" title="删除记录">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="text-muted">
+                                    <i class="fas fa-notes-medical fa-3x mb-3"></i>
+                                    <p class="mb-0">暂无健康记录</p>
+                                    <p class="small">点击"添加记录"按钮开始记录您的健康数据</p>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-        </main>
+        </div>
     </div>
 </div>
 
@@ -138,40 +188,26 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">添加健康记录</h5>
+                <h5 class="modal-title">
+                    <i class="fas fa-plus-circle text-primary me-2"></i>添加健康记录
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="addRecordForm" method="POST" action="{{ url_for('patient.add_health_record') }}">
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label">记录类型</label>
+                            <label class="form-label">记录类型 <span class="text-danger">*</span></label>
                             <select class="form-select" name="record_type" required>
                                 <option value="">请选择记录类型</option>
-                                <option value="MEDICAL_HISTORY">病史记录</option>
-                                <option value="PHYSICAL_EXAM">体检报告</option>
                                 <option value="DAILY_MONITOR">日常监测</option>
+                                <option value="PHYSICAL_EXAM">体检报告</option>
+                                <option value="MEDICAL_HISTORY">病史记录</option>
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">记录日期</label>
+                            <label class="form-label">记录日期 <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" name="record_date" required>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">症状描述</label>
-                        <textarea class="form-control" name="symptoms" rows="3"></textarea>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">身高 (cm)</label>
-                            <input type="number" class="form-control" name="height" step="0.1">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">体重 (kg)</label>
-                            <input type="number" class="form-control" name="weight" step="0.1">
                         </div>
                     </div>
 
@@ -179,54 +215,48 @@
                         <div class="col-md-6">
                             <label class="form-label">血压 (mmHg)</label>
                             <div class="input-group">
-                                <input type="number" class="form-control" name="blood_pressure_sys" placeholder="收缩压">
+                                <input type="number" class="form-control" name="blood_pressure_sys" 
+                                       placeholder="收缩压" min="60" max="200">
                                 <span class="input-group-text">/</span>
-                                <input type="number" class="form-control" name="blood_pressure_dia" placeholder="舒张压">
+                                <input type="number" class="form-control" name="blood_pressure_dia" 
+                                       placeholder="舒张压" min="40" max="120">
                             </div>
+                            <div class="form-text">正常范围：收缩压90-140，舒张压60-90</div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">心率 (次/分)</label>
-                            <input type="number" class="form-control" name="heart_rate">
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label">血糖 (mmol/L)</label>
-                            <input type="number" class="form-control" name="blood_sugar" step="0.1">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">体温 (℃)</label>
-                            <input type="number" class="form-control" name="body_temperature" step="0.1">
+                            <input type="number" class="form-control" name="blood_sugar" 
+                                   step="0.1" min="2" max="30" placeholder="请输入血糖值">
+                            <div class="form-text">空腹正常范围：3.9-6.1</div>
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label">血常规</label>
-                            <textarea class="form-control" name="blood_routine" rows="2"></textarea>
+                            <label class="form-label">心率 (次/分)</label>
+                            <input type="number" class="form-control" name="heart_rate" 
+                                   min="40" max="200" placeholder="请输入心率">
+                            <div class="form-text">正常范围：60-100</div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">尿常规</label>
-                            <textarea class="form-control" name="urine_routine" rows="2"></textarea>
+                            <label class="form-label">体重 (kg)</label>
+                            <input type="number" class="form-control" name="weight" 
+                                   step="0.1" min="20" max="200" placeholder="请输入体重">
                         </div>
                     </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">肝功能</label>
-                            <textarea class="form-control" name="liver_function" rows="2"></textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">肾功能</label>
-                            <textarea class="form-control" name="kidney_function" rows="2"></textarea>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">症状描述</label>
+                        <textarea class="form-control" name="symptoms" rows="3" 
+                                  placeholder="请描述您的症状或其他需要记录的信息..."></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="submit" form="addRecordForm" class="btn btn-primary">保存</button>
+                <button type="submit" form="addRecordForm" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>保存记录
+                </button>
             </div>
         </div>
     </div>
@@ -235,28 +265,14 @@
 
 {% block scripts %}
 <script>
-// 筛选面板切换
-document.getElementById('filterBtn').addEventListener('click', function() {
-    var filterPanel = document.getElementById('filterPanel');
-    var bsCollapse = new bootstrap.Collapse(filterPanel);
-    bsCollapse.toggle();
-});
-
-// 筛选表单提交处理
-document.getElementById('filterForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const formData = new FormData(this);
-    const params = new URLSearchParams();
-    
-    // 处理记录类型
-    for (let [key, value] of formData.entries()) {
-        if (value) {
-            params.append(key, value);
-        }
+// 时间范围选择处理
+document.getElementById('timeRange').addEventListener('change', function() {
+    const customDateRange = document.getElementById('customDateRange');
+    if (this.value === 'custom') {
+        customDateRange.style.display = 'block';
+    } else {
+        customDateRange.style.display = 'none';
     }
-    
-    // 更新URL并重新加载页面
-    window.location.search = params.toString();
 });
 
 // 导出功能
@@ -266,8 +282,8 @@ document.getElementById('exportBtn').addEventListener('click', function() {
 
 // 删除记录
 function deleteRecord(recordId) {
-    if (confirm('确定要删除这条记录吗？')) {
-        fetch("{{ url_for('patient.delete_record', record_id=0) }}".replace('0', recordId), {
+    if (confirm('确定要删除这条记录吗？此操作不可恢复。')) {
+        fetch(`{{ url_for('patient.delete_record', record_id=0) }}`.replace('0', recordId), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -276,43 +292,48 @@ function deleteRecord(recordId) {
             if (response.ok) {
                 window.location.reload();
             } else {
-                alert('删除失败，请稍后重试');
+                response.json().then(data => {
+                    alert(data.error || '删除失败，请稍后重试');
+                });
             }
+        }).catch(() => {
+            alert('网络错误，请稍后重试');
         });
     }
 }
 
-// 显示筛选状态
-function updateFilterStatus() {
-    const params = new URLSearchParams(window.location.search);
-    const filterStatus = document.getElementById('filterStatus');
-    const filterStatusText = document.getElementById('filterStatusText');
-    let statusText = [];
-
-    if (params.has('record_type')) {
-        statusText.push(`记录类型: ${params.get('record_type')}`);
+// 表单提交处理
+document.getElementById('filterForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const params = new URLSearchParams();
+    
+    for (let [key, value] of formData.entries()) {
+        if (value) {
+            params.append(key, value);
+        }
     }
-    if (params.has('time_range')) {
-        statusText.push(`时间范围: ${params.get('time_range')}`);
-    }
-    if (params.has('start_date') && params.has('end_date')) {
-        statusText.push(`日期: ${params.get('start_date')} 至 ${params.get('end_date')}`);
-    }
+    
+    window.location.search = params.toString();
+});
 
-    if (statusText.length > 0) {
-        filterStatusText.textContent = statusText.join(' | ');
-        filterStatus.style.display = 'block';
-    } else {
-        filterStatus.style.display = 'none';
+// 添加记录表单验证
+document.getElementById('addRecordForm').addEventListener('submit', function(e) {
+    const sys = this.blood_pressure_sys.value;
+    const dia = this.blood_pressure_dia.value;
+    
+    // 血压值验证
+    if ((sys && !dia) || (!sys && dia)) {
+        e.preventDefault();
+        alert('请完整填写收缩压和舒张压');
+        return;
     }
-}
-
-// 清除筛选
-function clearFilters() {
-    window.location.search = '';
-}
-
-// 页面加载时更新筛选状态
-document.addEventListener('DOMContentLoaded', updateFilterStatus);
+    
+    if (sys && dia && parseInt(sys) <= parseInt(dia)) {
+        e.preventDefault();
+        alert('收缩压必须大于舒张压');
+        return;
+    }
+});
 </script>
 {% endblock %} 

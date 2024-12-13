@@ -1,114 +1,239 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <!-- 左侧导航栏 -->
-        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-            <div class="position-sticky">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('doctor.home') }}">
-                            <i class="fas fa-home"></i> 工作台
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('doctor.add_record') }}">
-                            <i class="fas fa-plus-circle"></i> 添加记录
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+<div class="container-fluid py-4">
+    <!-- 页面标题和快捷操作 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0">
+                <i class="fas fa-stethoscope text-primary"></i> 医生工作台
+            </h2>
+            <p class="text-muted mb-0">欢迎回来，{{ current_user.name }} 医生</p>
+        </div>
+        <div class="btn-group">
+            <a href="{{ url_for('doctor.add_record') }}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> 添加记录
+            </a>
+            <a href="{{ url_for('doctor.patient_list') }}" class="btn btn-outline-primary">
+                <i class="fas fa-users me-1"></i> 患者管理
+            </a>
+        </div>
+    </div>
 
-        <!-- 主要内容区域 -->
-        <main class="col-md-10 ms-sm-auto px-md-4">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">医生工作台</h1>
-            </div>
-
-            <!-- 统计卡片 -->
-            <div class="row">
-                <div class="col-md-3 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">今日就诊</h5>
-                            <p class="card-text display-4">{{ today_visits }}</p>
+    <!-- 统计卡片 -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-user-injured text-primary"></i>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">待复诊</h5>
-                            <p class="card-text display-4">{{ follow_up_count }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">本月新增患者</h5>
-                            <p class="card-text display-4">{{ new_patients_month }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">我的患者</h5>
-                            <p class="card-text display-4">{{ my_patients }}/{{ total_patients }}</p>
+                        <div>
+                            <h6 class="text-muted mb-1">今日就诊</h6>
+                            <h3 class="mb-0">{{ today_records }}</h3>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- 最近就诊记录 -->
-            <div class="row mt-4">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0">最近就诊记录</h5>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-warning bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-calendar-check text-warning"></i>
                         </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>就诊日期</th>
-                                            <th>患者姓名</th>
-                                            <th>就诊类型</th>
-                                            <th>主要症状</th>
-                                            <th>诊断结果</th>
-                                            <th>操作</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for record in recent_records %}
-                                        <tr>
-                                            <td>{{ record.record_date.strftime('%Y-%m-%d') }}</td>
-                                            <td>{{ record.patient.name }}</td>
-                                            <td>{{ record.record_type }}</td>
-                                            <td>{{ record.symptoms[:30] + '...' if record.symptoms and record.symptoms|length > 30 else record.symptoms }}</td>
-                                            <td>{{ record.diagnosis[:30] + '...' if record.diagnosis and record.diagnosis|length > 30 else record.diagnosis }}</td>
-                                            <td>
-                                                <a href="{{ url_for('doctor.view_patient', patient_id=record.patient_id) }}" class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-eye"></i> 查看
-                                                </a>
-                                                <a href="{{ url_for('doctor.edit_record', record_id=record.id) }}" class="btn btn-sm btn-outline-secondary">
-                                                    <i class="fas fa-edit"></i> 编辑
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
+                        <div>
+                            <h6 class="text-muted mb-1">待复诊</h6>
+                            <h3 class="mb-0">{{ pending_patients }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-danger bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-exclamation-circle text-danger"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">异常指标</h6>
+                            <h3 class="mb-0">{{ abnormal_records }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-user-plus text-success"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">我的患者</h6>
+                            <h3 class="mb-0">{{ my_patients }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- 今日待办 -->
+        <div class="col-xl-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tasks text-primary me-2"></i>今日待办
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for task in tasks %}
+                        <div class="list-group-item border-0 py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ task.title }}</h6>
+                                    <small class="text-muted">{{ task.time }}</small>
+                                </div>
+                                <span class="badge bg-{{ task.status_color }}">{{ task.status }}</span>
                             </div>
                         </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle text-muted fa-2x mb-3"></i>
+                            <p class="text-muted mb-0">暂无待办事项</p>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
+
+        <!-- 最近就诊记录 -->
+        <div class="col-xl-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history text-primary me-2"></i>最近就诊记录
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>就诊时间</th>
+                                    <th>患者信息</th>
+                                    <th>就诊类型</th>
+                                    <th>主要症状</th>
+                                    <th>诊断结果</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in recent_records %}
+                                <tr>
+                                    <td>{{ record.record_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm bg-light rounded-circle me-2">
+                                                <span class="text-primary">{{ record.patient.name[0] }}</span>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">{{ record.patient.name }}</h6>
+                                                <small class="text-muted">{{ record.patient.age }}岁 {{ record.patient.gender }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'primary' if record.record_type == '初诊' else 'info' }}">
+                                            {{ record.record_type }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="text-truncate d-inline-block" style="max-width: 200px;">
+                                            {{ record.symptoms }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="text-truncate d-inline-block" style="max-width: 200px;">
+                                            {{ record.diagnosis }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('doctor.view_patient', patient_id=record.patient_id) }}" 
+                                           class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('doctor.edit_record', record_id=record.id) }}" 
+                                           class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-notes-medical fa-3x mb-3"></i>
+                                            <p class="mb-0">暂无就诊记录</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.1)!important;
+}
+
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+}
+
+.list-group-item {
+    transition: background-color 0.2s ease;
+}
+
+.list-group-item:hover {
+    background-color: var(--bs-light);
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.text-truncate {
+    max-width: 150px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+</style>
 {% endblock %} 
