@@ -2,18 +2,135 @@
 
 {% block content %}
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8 text-center">
-            <h1 class="mt-5">欢迎使用老年人健康档案服务平台</h1>
-            <p class="lead">为老年人提供全面的健康管理服务</p>
+    <!-- 欢迎区域 -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-10 text-center">
+            <h1 class="display-4 mt-5 mb-4" style="color: #2c3e50; font-weight: bold;">
+                <i class="fas fa-heartbeat text-primary me-3"></i>欢迎使用老年人健康档案服务平台
+            </h1>
+            <p class="lead mb-4" style="color: #34495e; font-size: 1.3rem;">
+                您的健康，我们用心守护
+            </p>
             
             {% if not current_user.is_authenticated %}
-            <div class="mt-4">
-                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg mx-2">注册</a>
-                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg mx-2">登录</a>
+            <div class="mt-4 mb-5">
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg mx-2 px-4 py-2" style="font-size: 1.2rem;">
+                    <i class="fas fa-user-plus me-2"></i>免费注册
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg mx-2 px-4 py-2" style="font-size: 1.2rem;">
+                    <i class="fas fa-sign-in-alt me-2"></i>立即登录
+                </a>
             </div>
             {% endif %}
         </div>
     </div>
+
+    <!-- 功能特点展示 -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm text-center">
+                <div class="card-body">
+                    <i class="fas fa-notes-medical fa-3x text-primary mb-3"></i>
+                    <h3 class="card-title h5">健康档案管理</h3>
+                    <p class="card-text">便捷记录和管理您的健康数据，随时查看健康状况</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm text-center">
+                <div class="card-body">
+                    <i class="fas fa-user-md fa-3x text-success mb-3"></i>
+                    <h3 class="card-title h5">专业医生指导</h3>
+                    <p class="card-text">专业医生在线解答，提供个性化健康建议</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm text-center">
+                <div class="card-body">
+                    <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
+                    <h3 class="card-title h5">健康趋势分析</h3>
+                    <p class="card-text">智能分析健康数据，及时发现潜在健康风险</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm text-center">
+                <div class="card-body">
+                    <i class="fas fa-book-medical fa-3x text-warning mb-3"></i>
+                    <h3 class="card-title h5">健康知识教育</h3>
+                    <p class="card-text">提供丰富的健康知识，助您养成健康生活习惯</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 使用指南 -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-10">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title h4 text-center mb-4">
+                        <i class="fas fa-info-circle text-primary me-2"></i>快速开始使用
+                    </h2>
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="rounded-circle bg-light d-inline-block p-3 mb-2">
+                                <span class="h4 text-primary m-0">1</span>
+                            </div>
+                            <p class="mb-0">注册账号，填写基本信息</p>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="rounded-circle bg-light d-inline-block p-3 mb-2">
+                                <span class="h4 text-primary m-0">2</span>
+                            </div>
+                            <p class="mb-0">录入您的健康数据</p>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <div class="rounded-circle bg-light d-inline-block p-3 mb-2">
+                                <span class="h4 text-primary m-0">3</span>
+                            </div>
+                            <p class="mb-0">获取专业健康建议</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- 添加自定义样式 -->
+<style>
+    .card {
+        transition: transform 0.2s;
+        border-radius: 15px;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    .btn {
+        border-radius: 30px;
+        transition: all 0.3s;
+    }
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .rounded-circle {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+    /* 增加文字大小，适合老年人阅读 */
+    .card-text {
+        font-size: 1.1rem;
+    }
+    /* 增加图标大小 */
+    .fa-3x {
+        font-size: 3.5em;
+    }
+</style>
 {% endblock %} 
